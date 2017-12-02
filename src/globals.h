@@ -12,6 +12,7 @@ extern unsigned char currentSpriteId;
 extern unsigned char playerDirection, playerAnimState, playerVelocityLockTime, playerInvulnTime;
 extern int playerX, playerY, playerXVelocity, playerYVelocity;
 extern unsigned char gemsInLevel;
+extern int xDelta, yDelta, scratchX, scratchY;
 
 extern char currentLevel[256];
 extern char screenBuffer[48];
@@ -139,3 +140,8 @@ void animate_fadein(unsigned char _delay);
 #pragma zpsym ("playerYVelocity")
 #pragma zpsym ("playerVelocityLockTime")
 #pragma zpsym ("gemsInLevel")
+#pragma zpsym ("FRAME_COUNTER")
+#pragma zpsym ("scratchX")
+#pragma zpsym ("scratchY")
+#pragma zpsym ("xDelta")
+#pragma zpsym ("yDelta")

@@ -20,13 +20,12 @@ const unsigned char sprite_data[] = {
 };
 
 static char sprite_directions[12];
-static char sprite_direction_time[12];
-
+static char sprite_speeds[12];
 
 void banked_draw_sprites() {
 	for (i = 0; i < 12; i++) {
         sprite_directions[i] = SPRITE_DIRECTION_UNDEF;
-		sprite_direction_time[i] = 0;
+        sprite_speeds[i] = 0;
     }
 
 	for (i = 0; i < 12 && currentLevel[MAP_TILE_SIZE + (i<<1)] != 255; ++i) {
@@ -71,5 +70,138 @@ void banked_draw_sprites() {
 }
 
 void banked_update_sprites() {
+
+    for (i = 0; i < 12; i++) {
+		// Skipping the nice oam functions here because... well, they do more than I want right now.
+		if (*(unsigned char*)(0x200 + FIRST_ENEMY_SPRITE_ID+(i<<4)) == NESLIB_SPRITE_GONE)
+            continue;
+         
+        // Enemies move at the same time the player does
+        if (!playerVelocityLockTime) {
+
+            sprite_directions[i] = SPRITE_DIRECTION_UNDEF;
+            sprite_speeds[i] = 0;
+            continue;
+        }
+
+		scratchInt = (0x200 + FIRST_ENEMY_SPRITE_ID + (i<<4));
+		if ((extendedSpriteData[(i<<2)+1] & SPRITE_ANIM_MASK) == SPRITE_ANIM_DEFAULT) {
+			scratch = extendedSpriteData[(i<<2)+2];
+			scratch += (FRAME_COUNTER & 0x10) ? 0 : 2;
+			*(unsigned char*)(scratchInt+1) = scratch;
+			*(unsigned char*)(scratchInt+5) = scratch+1;
+			*(unsigned char*)(scratchInt+9) = scratch+0x10;
+			*(unsigned char*)(scratchInt+13) = scratch+0x11;
+		} else if ((extendedSpriteData[(i<<2)+1] & SPRITE_ANIM_MASK) == SPRITE_ANIM_FULL && sprite_directions[i] != SPRITE_DIRECTION_UNDEF) {
+			scratch = extendedSpriteData[(i<<2)+2];
+			scratch += (FRAME_COUNTER & 0x10) ? 0 : 2;
+			if (sprite_directions[i] != SPRITE_DIRECTION_UNDEF)
+				scratch += sprite_directions[i];
+			else
+				scratch += SPRITE_DIRECTION_DOWN;
+			*(unsigned char*)(scratchInt+1) = scratch;
+			*(unsigned char*)(scratchInt+5) = scratch+1;
+			*(unsigned char*)(scratchInt+9) = scratch+0x10;
+			*(unsigned char*)(scratchInt+13) = scratch+0x11;
+		}
+
+		// If you're an enemy, we can move you around! Imagine that...
+		if (extendedSpriteData[i<<2] == SPRITE_TYPE_ENEMY) {
+			scratch = scratch4 = *(unsigned char*)(scratchInt+3); // X
+			scratch2 = scratch5 = *(unsigned char*)(scratchInt); // Y
+            // scratch3 is whether to switch direction... 
+            // FIXME: Work with player stuffs.
+			if (sprite_directions[i] == SPRITE_DIRECTION_UNDEF) {
+                xDelta = (playerX >> 2) - scratch;
+                yDelta = (playerY >> 2) - scratch2;
     
+
+                if (abs(xDelta) > abs(yDelta)) {
+                    if (xDelta > 0) {
+                        scratch3 = SPRITE_DIRECTION_RIGHT;
+                    } else {
+                        scratch3 = SPRITE_DIRECTION_LEFT;
+                    }
+                } else {
+                    if (yDelta > 0) {
+                        scratch3 = SPRITE_DIRECTION_DOWN;
+                    } else {
+                        scratch3 = SPRITE_DIRECTION_UP;
+                    }
+                }
+        
+				sprite_directions[i] = scratch3;
+
+                // Okay, while the player's moving for playerVelocityLockTime, we need to move extendedSpriteData[x+3] tiles, or ESD[x+3]*16 pixels. Math.
+                sprite_speeds[i] = (extendedSpriteData[(i<<2)+3]<<4) / playerVelocityLockTime;
+                if (sprite_speeds[i] == 0)
+                    sprite_speeds[i] = 1;
+            }
+            
+            if (playerVelocityLockTime == 1) {
+                scratch4 = (scratch4 + 8) & 0xf0;
+                scratch5 = (scratch5 + 8) & 0xf0;
+            }
+
+			if (sprite_directions[i] != SPRITE_DIRECTION_UNDEF) {
+				switch (sprite_directions[i]) {
+					case SPRITE_DIRECTION_LEFT:
+                        if (playerVelocityLockTime != 1)
+                            scratch4 -= sprite_speeds[i];
+                        scratchX = scratch4 + SPRITE_X_FUZZ;
+                        scratchY = scratch5 + SPRITE_Y_FUZZ;
+						if (test_collision(currentLevel[(scratchX>>4)+((((scratchY)>>4))<<4)], 0) || test_collision(currentLevel[(scratchX>>4)+((((scratchY+SPRITE_HEIGHT)>>4))<<4)], 0)) {
+							scratch4 = scratch;
+						}
+
+						break;
+					case SPRITE_DIRECTION_RIGHT:
+                        if (playerVelocityLockTime != 1)
+                            scratch4 += sprite_speeds[i];
+                        scratchX = scratch4 + SPRITE_X_FUZZ;
+                        scratchY = scratch5 + SPRITE_Y_FUZZ;
+						if (test_collision(currentLevel[((scratchX+SPRITE_WIDTH)>>4)+(((scratchY>>4))<<4)], 0) || test_collision(currentLevel[((scratchX+SPRITE_WIDTH)>>4)+((((scratchY+SPRITE_HEIGHT)>>4))<<4)], 0)) {
+							scratch4 = scratch;
+						}
+
+						break;
+                    case SPRITE_DIRECTION_UP:
+                        if (playerVelocityLockTime != 1)
+                            scratch5 -= sprite_speeds[i];
+                        scratchX = scratch4 + SPRITE_X_FUZZ;
+                        scratchY = scratch5 + SPRITE_Y_FUZZ;
+						if (test_collision(currentLevel[(scratchX>>4)+((((scratchY)>>4))<<4)], 0) || test_collision(currentLevel[((scratchX+SPRITE_WIDTH)>>4)+(((scratchY>>4))<<4)], 0)) {
+							scratch5 = scratch2;
+						}
+						break;
+					case SPRITE_DIRECTION_DOWN:
+                        if (playerVelocityLockTime != 1)
+                            scratch5 += sprite_speeds[i];
+                        scratchX = scratch4 + SPRITE_X_FUZZ;
+                        scratchY = scratch5 + SPRITE_Y_FUZZ;
+
+						if (test_collision(currentLevel[((scratchX)>>4)+((((scratchY+SPRITE_HEIGHT)>>4))<<4)], 0) || test_collision(currentLevel[((scratchX+SPRITE_WIDTH)>>4)+((((scratchY+SPRITE_HEIGHT)>>4))<<4)], 0)) {
+							scratch5 = scratch2;
+						}
+
+						break;
+				}
+
+			}
+			
+
+			*(unsigned char*)(scratchInt) = scratch5;
+			*(unsigned char*)(scratchInt+4) = scratch5;
+			*(unsigned char*)(scratchInt+8) = scratch5+8;
+			*(unsigned char*)(scratchInt+12) = scratch5+8;
+
+			*(unsigned char*)(scratchInt+3) = scratch4;
+			*(unsigned char*)(scratchInt+7) = scratch4+8;
+			*(unsigned char*)(scratchInt+11) = scratch4;
+			*(unsigned char*)(scratchInt+15) = scratch4+8;
+
+		}
+
+
+	}
 }

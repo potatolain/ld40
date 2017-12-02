@@ -38,6 +38,7 @@ unsigned char gemCount;
 unsigned char playerDirection, playerAnimState, playerVelocityLockTime, playerInvulnTime;
 int playerX, playerY, playerXVelocity, playerYVelocity;
 unsigned char gemsInLevel;
+int xDelta, yDelta, scratchX, scratchY;
 
 #pragma bssseg (pop)
 #pragma dataseg(pop)
@@ -294,6 +295,7 @@ void main(void) {
 				staticPadState = pad_trigger(0);		
 				currentPadState = pad_state(0);
 				do_movement();
+				update_sprites();
 
 				break;
 			case GAME_STATE_LEVEL_LOST:

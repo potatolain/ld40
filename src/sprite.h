@@ -27,8 +27,10 @@
 #define NESLIB_SPRITE_GONE 0xf0
 
 // TODO: Do we wanna be smarter about sprite size?
-#define SPRITE_WIDTH 16
-#define SPRITE_HEIGHT 16
+#define SPRITE_WIDTH 12
+#define SPRITE_HEIGHT 12
+#define SPRITE_X_FUZZ 2
+#define SPRITE_Y_FUZZ 2
 
 
 void banked_draw_sprites();
