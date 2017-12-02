@@ -5,6 +5,7 @@
 #include "src/level.h"
 #include "src/globals.h"
 #include "src/hud.h"
+#include "src/sprite.h"
 #include "levels/processed/lvl1_tiles.h"
 
 // Suggestion: Define smart names for your banks and use defines like this. 
@@ -23,7 +24,6 @@ const unsigned char levelPalette[16]={ 0x0f,0x00,0x10,0x30,0x0f,0x01,0x21,0x31,0
 const unsigned char spritePalette[16]={ 0x0f,0x00,0x10,0x30,0x0f,0x01,0x21,0x31,0x0f,0x15,0x25,0x35,0x0f,0x09,0x19,0x29 };
 
 
-
 // Globals! Defined as externs in src/globals.h
 #pragma bssseg (push,"ZEROPAGE")
 #pragma dataseg(push,"ZEROPAGE")
@@ -33,16 +33,23 @@ int scratch, scratch2, scratch3, scratch4, scratch5;
 unsigned char gameState;
 unsigned char currentLevelId;
 unsigned char playerOverworldPosition;
+unsigned char currentSpriteId;
 unsigned int scratchInt;
 unsigned char gemCount;
 #pragma bssseg (pop)
 #pragma dataseg(pop)
 
 char currentLevel[256];
+char extendedSpriteData[56];
+
+const unsigned char BYTE_TO_BIT[] = {
+	0x01, 0x02, 0x04, 0x08,
+	0x10, 0x20, 0x40, 0x80
+};
+
 
 // Local to this file.
 static unsigned char playMusic;
-static unsigned char chrBank;
 static unsigned char mirrorMode;
 static char screenBuffer[48];
 
@@ -91,6 +98,16 @@ void update_hud() {
 	banked_update_hud();
 }
 
+void draw_sprites() {
+	set_prg_bank(SPRITE_BANK);
+	banked_draw_sprites();
+}
+
+void update_sprites() {
+	set_prg_bank(SPRITE_BANK);
+	banked_update_sprites();
+}
+
 // Main entry point for the application.
 void main(void) {
 
@@ -103,6 +120,8 @@ void main(void) {
 
 	pal_col(1,0x19);//set dark green color
 	pal_col(17,0x19);
+	scroll(0, 0);
+	
 
 	ppu_on_all();
 	gameState = GAME_STATE_INIT;
@@ -121,7 +140,7 @@ void main(void) {
 				break;
 			case GAME_STATE_POST_START:
 				currentLevelId = 0;
-				playerOverworldPosition = 1;
+				playerOverworldPosition = 0;
 				set_prg_bank(BANK_FIRST_LEVEL+currentLevelId);
 
 				// NOTE: Yes, this says lvl1 - it'll line up with whatever we get though.
@@ -136,12 +155,14 @@ void main(void) {
 				// TODO: Move this bit to level instead (make sure to turn off ppu!)
 				draw_level();
 				draw_hud();
+				draw_sprites();
 				gemCount = 0;
 				// TODO: Nice fade anim into level(s)
 				ppu_on_all();
 				gameState = GAME_STATE_RUNNING;
 				break;
 			case GAME_STATE_RUNNING:
+
 				break;
 			case GAME_STATE_PAUSED:
 				break;

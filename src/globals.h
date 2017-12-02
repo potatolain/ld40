@@ -8,14 +8,24 @@ extern unsigned char currentLevelId;
 extern unsigned char playerOverworldPosition;
 extern unsigned int scratchInt;
 extern unsigned char gemCount;
+extern unsigned char currentSpriteId;
 
 extern char currentLevel[256];
 extern char screenBuffer[48];
+extern char extendedSpriteData[56];
+
+extern unsigned char FRAME_COUNTER;
+
+extern const unsigned char BYTE_TO_BIT[8];
+
 
 // Get at the stuff in level data from whatever bank is loaded. (Loads const data from assembly)
 extern const char lvl_details[4];
 
 void put_str(unsigned int adr, const char *str);
+
+// Crappy macro to get absolute value in an absolutely disgusting way
+#define abs(x) (x > 0 ? x : 0-x)
 
 #define SHOW_VERSION_INFO 1 
 
@@ -30,7 +40,7 @@ void put_str(unsigned int adr, const char *str);
 #define GAME_STATE_TITLE 201
 #define GAME_STATE_INIT 200
 
-#define DEFAULT_SPEED 3
+#define DEFAULT_SPEED 5
 
 #define HUD_BLANK 0xff
 #define HUD_NUMBERS 0xf3
@@ -46,6 +56,11 @@ void put_str(unsigned int adr, const char *str);
 #define HUD_SP 0xe7
 #define HUD_D 0xe9
 
+#define MAP_TILE_SIZE 192
+
+#define PLAYER_SPRITE_ID 0x10
+#define FIRST_ENEMY_SPRITE_ID 0x20
+
 #pragma zpsym ("currentPadState")
 #pragma zpsym ("i")
 #pragma zpsym ("j")
@@ -59,3 +74,4 @@ void put_str(unsigned int adr, const char *str);
 #pragma zpsym ("currentLevelId")
 #pragma zpsym ("playerOverworldPosition")
 #pragma zpsym ("gemCount")
+#pragma zpsym ("currentSpriteId")
