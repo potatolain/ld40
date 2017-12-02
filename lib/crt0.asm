@@ -238,6 +238,7 @@ detectNTSC:
 
 	.include "lib/neslib.asm"
 	.include "lib/boilerplate.asm"
+	.include "levels/all.asm"
 
 .segment "RODATA"
 

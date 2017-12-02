@@ -5,6 +5,9 @@ extern unsigned char i, j, scratch;
 extern char currentMessage[16];
 extern unsigned char gameState;
 
+// Get at the stuff in level data from whatever bank is loaded. (Loads const data from assembly)
+extern const char lvl_details[4];
+
 void put_str(unsigned int adr, const char *str);
 
 #define SHOW_VERSION_INFO 1 

@@ -7,7 +7,7 @@
 ### USER EDITABLE STUFF STARTS HERE
 
 ROM_NAME=lava_lamp
-OBJECTS_TO_BUILD=$(ROM_NAME).c bin/build_info.h bin/crt0.o bin/$(ROM_NAME).o bin/title.o bin/rom_1.o
+OBJECTS_TO_BUILD=$(ROM_NAME).c bin/build_info.h levels/processed/lvl1_tiles.asm bin/crt0.o bin/$(ROM_NAME).o bin/title.o bin/rom_1.o
 
 ROOT_DIR:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 MAIN_COMPILER=./tools/cc65/bin/cc65
@@ -16,6 +16,7 @@ MAIN_LINKER=./tools/cc65/bin/ld65
 MAIN_EMULATOR=tools/fceux/fceux
 DEBUG_EMULATOR=tools/nintendulatordx/nintendulator
 SPACE_CHECKER=tools/nessc/nessc
+LEVEL_CONVERTER=node tools/level-converter
 CONFIG_FILE=$(ROOT_DIR)/cfg/game.cfg
 ifeq ($(OS),Windows_NT)
 	TEXT2DATA=tools/famitone2/tools/text2data
@@ -50,6 +51,9 @@ sound/sfx.s: sound/sfx.nsf
 
 sound/music.s: sound/music.txt
 	$(TEXT2DATA) sound/music.txt -ca65 -ntsc
+
+levels/processed/%_tiles.asm: levels/%.json
+	$(LEVEL_CONVERTER) $<
 
 bin/%.o: bin/%.s
 	$(MAIN_ASM_COMPILER) $<
