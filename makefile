@@ -6,7 +6,7 @@
 
 ### USER EDITABLE STUFF STARTS HERE
 
-ROM_NAME=hello_world
+ROM_NAME=lava_lamp
 OBJECTS_TO_BUILD=$(ROM_NAME).c bin/build_info.h bin/crt0.o bin/$(ROM_NAME).o bin/rom_0.o bin/rom_1.o
 
 ROOT_DIR:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
