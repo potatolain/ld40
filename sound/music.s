@@ -15,7 +15,7 @@ music_music_data:
 @env0:
 	.byte $c0,$00,$00
 @env1:
-	.byte $ca,$00,$00
+	.byte $c4,$00,$00
 
 
 @song0ch0:

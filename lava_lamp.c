@@ -19,7 +19,6 @@
 #define CHR_BANK_1 2 // NOTE: We have two copies of the same 4k data in the 8k .chr files (because I'm lazy, ok?) so we use bank 2 to get the inverted one.
 
 #define DUMMY_SONG 0
-#define SFX_BOING 0 
 
 const unsigned char levelPalette[16]={ 0x0f,0x00,0x10,0x30,0x0f,0x11,0x21,0x31,0x0f,0x05,0x15,0x25,0x0f,0x09,0x19,0x29 };
 const unsigned char spritePalette[16]={ 0x0f,0x00,0x10,0x30,0x0f,0x11,0x21,0x31,0x0f,0x05,0x15,0x25,0x0f,0x09,0x19,0x29 };
@@ -69,6 +68,37 @@ void put_str(unsigned int adr, const char *str) {
 	}
 }
 
+void clear_screen() {
+	// Clear the screen to start
+	vram_adr(0x2000);
+	vram_fill(HUD_BLANK, 0x03c0);
+	vram_fill(0, 0x040);
+	vram_adr(0x2800);
+	vram_fill(HUD_BLANK, 0x03c0);
+	vram_fill(0, 0x040);
+}
+
+void animate_fadeout(unsigned char _delay) {
+	pal_bright(3);
+	delay(_delay);
+	pal_bright(2);
+	delay(_delay);
+	pal_bright(1);
+	delay(_delay);
+	pal_bright(0);
+}
+
+void animate_fadein(unsigned char _delay) {
+	pal_bright(1);
+	delay(_delay);
+	pal_bright(2);
+	delay(_delay);
+	pal_bright(3);
+	delay(_delay);
+	pal_bright(4);
+
+}
+
 void write_screen_buffer(unsigned char x, unsigned char y, char* data) {
 	screenBuffer[0] = MSB(NTADR_A(x, y)) | NT_UPD_HORZ;
 	screenBuffer[1] = LSB(NTADR_A(x, y));
@@ -87,6 +117,16 @@ void draw_title() {
 void do_title() {
 	set_prg_bank(TITLE_BANK);
 	banked_do_title();
+}
+
+void show_level_complete() {
+	set_prg_bank(TITLE_BANK);
+	banked_show_level_complete();
+}
+
+void do_level_complete() {
+	set_prg_bank(TITLE_BANK);
+	banked_do_level_complete();
 }
 
 void draw_level() {
@@ -112,6 +152,7 @@ void update_hud() {
 		for (i = 0; i != MAP_TILE_SIZE; ++i) {
 			if ((currentLevel[i] & 0x3f) == TILE_DOOR) {
 				scratchInt = NAMETABLE_A + ((i % 16) << 1) + ((i / 16) << 6);
+				currentLevel[i] = TILE_DOOR_OPEN;
 				break;
 			}
 		}
@@ -138,6 +179,16 @@ void update_hud() {
     set_vram_update(screenBuffer);
 }
 
+void do_pause() {
+	set_prg_bank(HUD_BANK);
+	banked_do_pause();
+}
+
+void draw_pause() {
+	set_prg_bank(HUD_BANK);
+	banked_draw_pause();
+}
+
 void draw_sprites() {
 	set_prg_bank(SPRITE_BANK);
 	banked_draw_sprites();
@@ -162,6 +213,9 @@ unsigned char test_collision(unsigned char tileId, unsigned char isPlayer) {
 	char temp = tileId & 0x3f;
 	if (temp > 7 && temp < 16) {
 		return 1;
+	}
+	if (isPlayer && temp == TILE_DOOR_OPEN) {
+		gameState = GAME_STATE_LEVEL_COMPLETE;
 	}
 	return 0;
 }
@@ -199,6 +253,10 @@ void main(void) {
 			case GAME_STATE_POST_START:
 				currentLevelId = 0;
 				playerOverworldPosition = 0;
+				gameState = GAME_STATE_LEVEL_START;
+				break;
+			case GAME_STATE_LEVEL_START: 
+				animate_fadeout(5);
 				set_prg_bank(BANK_FIRST_LEVEL+currentLevelId);
 
 				// NOTE: Yes, this says lvl1 - it'll line up with whatever we get though.
@@ -212,21 +270,47 @@ void main(void) {
 				
 				// TODO: Move this bit to level instead (make sure to turn off ppu!)
 				// NOTE: Order here is important - hud relies on the draw_sprites method and count
-				gemCount = 0;				
+				gemCount = 0;		
+				playerXVelocity = 0;
+				playerYVelocity = 0;
+				playerVelocityLockTime = 0;		
 				draw_level();
 				draw_sprites();
 				draw_hud();				
 				// TODO: Nice fade anim into level(s)
 				ppu_on_all();
+				animate_fadein(5);
 				gameState = GAME_STATE_RUNNING;
 				break;
+			
 			case GAME_STATE_RUNNING:
 				staticPadState = pad_trigger(0);		
 				currentPadState = pad_state(0);
 				do_movement();
 
 				break;
+			case GAME_STATE_LEVEL_COMPLETE:
+
+				animate_fadeout(5);
+				show_level_complete();
+				animate_fadein(5);
+				do_level_complete();
+				gameState = GAME_STATE_LEVEL_START;
+				playerOverworldPosition++;
+				break;
 			case GAME_STATE_PAUSE:
+				animate_fadeout(5);
+				ppu_off();
+				draw_pause();
+				scroll(0, 240);
+				ppu_on_bg();
+				animate_fadein(5);
+				do_pause();
+				animate_fadeout(5);
+				scroll(0, 0);
+				ppu_on_all();
+				animate_fadein(5);
+				gameState = GAME_STATE_RUNNING;
 				break;
 			default:
 				ppu_off();

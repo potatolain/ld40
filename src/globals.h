@@ -29,6 +29,9 @@ void put_str(unsigned int adr, const char *str);
 unsigned char test_collision(unsigned char tileId, unsigned char isPlayer);
 void do_sprite_collision();
 void update_hud();
+void clear_screen();
+void animate_fadeout(unsigned char _delay);
+void animate_fadein(unsigned char _delay);
 
 // Crappy macro to get absolute value in an absolutely disgusting way
 #define abs(x) (x > 0 ? x : 0-x)
@@ -42,6 +45,8 @@ void update_hud();
 
 #define GAME_STATE_RUNNING 0
 #define GAME_STATE_POST_START 1
+#define GAME_STATE_LEVEL_START 10
+#define GAME_STATE_LEVEL_COMPLETE 50
 #define GAME_STATE_PAUSE 100
 #define GAME_STATE_TITLE 201
 #define GAME_STATE_INIT 200
@@ -64,6 +69,9 @@ void update_hud();
 #define HUD_E 0xe4
 #define HUD_SP 0xe7
 #define HUD_D 0xe9
+#define HUD_A 0xec
+#define HUD_U 0xed
+#define HUD_P 0xfd
 
 #define MAP_TILE_SIZE 192
 
@@ -88,8 +96,9 @@ void update_hud();
 #define TILE_DOOR_OPEN 7
 #define TILE_DOOR_OPEN_ABS 0x0e
 
-#define SFX_PAUSE 0
-#define SFX_GEM 0
+#define SFX_PAUSE_UP 2
+#define SFX_PAUSE_DOWN 1
+#define SFX_GEM 3
 
 #pragma zpsym ("currentPadState")
 #pragma zpsym ("staticPadState")

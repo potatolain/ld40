@@ -54,7 +54,7 @@ void banked_do_movement() {
 
 	if (staticPadState & PAD_START) {
 		gameState = GAME_STATE_PAUSE;
-		sfx_play(SFX_PAUSE, 2);
+		sfx_play(SFX_PAUSE_UP, 2);
 		return; // Don't do anything else.
     }
 
