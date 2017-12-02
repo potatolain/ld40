@@ -11,6 +11,7 @@ extern unsigned char gemCount;
 extern unsigned char currentSpriteId;
 extern unsigned char playerDirection, playerAnimState, playerVelocityLockTime, playerInvulnTime;
 extern int playerX, playerY, playerXVelocity, playerYVelocity;
+extern unsigned char gemsInLevel;
 
 extern char currentLevel[256];
 extern char screenBuffer[48];
@@ -27,6 +28,7 @@ extern const char lvl_details[4];
 void put_str(unsigned int adr, const char *str);
 unsigned char test_collision(unsigned char tileId, unsigned char isPlayer);
 void do_sprite_collision();
+void update_hud();
 
 // Crappy macro to get absolute value in an absolutely disgusting way
 #define abs(x) (x > 0 ? x : 0-x)
@@ -46,7 +48,7 @@ void do_sprite_collision();
 
 #define PLAYER_SPRITE_TILE 0x60
 
-#define DEFAULT_SPEED 16
+#define DEFAULT_SPEED 6
 
 #define HUD_BLANK 0xff
 #define HUD_NUMBERS 0xf3
@@ -58,6 +60,7 @@ void do_sprite_collision();
 #define HUD_BR 0xf1
 #define HUD_GEMS 0xe3
 #define HUD_COLON 0xea
+#define HUD_SLASH 0xeb
 #define HUD_E 0xe4
 #define HUD_SP 0xe7
 #define HUD_D 0xe9
@@ -80,8 +83,13 @@ void do_sprite_collision();
 #define PLAYER_WIDTH 16
 #define PLAYER_HEIGHT 16
 
+#define TILE_DOOR 6
+#define TILE_DOOR_ABS 0x0c
+#define TILE_DOOR_OPEN 7
+#define TILE_DOOR_OPEN_ABS 0x0e
 
 #define SFX_PAUSE 0
+#define SFX_GEM 0
 
 #pragma zpsym ("currentPadState")
 #pragma zpsym ("staticPadState")
@@ -105,3 +113,4 @@ void do_sprite_collision();
 #pragma zpsym ("playerXVelocity")
 #pragma zpsym ("playerYVelocity")
 #pragma zpsym ("playerVelocityLockTime")
+#pragma zpsym ("gemsInLevel")

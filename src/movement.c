@@ -1,9 +1,9 @@
 #include "src/globals.h"
 #include "lib/neslib.h"
+#include "src/sprite.h"
 #include "src/movement.h"
 
 unsigned int get_bunny_speed() {
-    unsigned char gemCount = 6;
     switch (gemCount) {
         case 6:
             return 0;
@@ -22,7 +22,6 @@ unsigned int get_bunny_speed() {
     }
 }
 unsigned char get_lock_time() {
-    unsigned char gemCount = 6;
     switch (gemCount) {
         case 6:
             return 0;
@@ -42,14 +41,10 @@ unsigned char get_lock_time() {
 }
 
 void banked_do_movement() {
-    unsigned char gemCount = 6;
     unsigned int maxVelocity = get_bunny_speed();
     unsigned char lockTime = get_lock_time();
-    if (DEFAULT_SPEED - gemCount <= 0) {
-        maxVelocity = 0;
-        lockTime = 0;
-    }
-	#if DEBUG
+
+    #if DEBUG
 		if (currentPadState & PAD_START && currentPadState & PAD_SELECT) {
 			gameState = GAME_STATE_LEVEL_COMPLETE;
 			return;
@@ -203,5 +198,55 @@ void banked_do_movement() {
 
 
 void banked_do_sprite_collision() {
+	scratch = playerX>>2;
+	scratch2 = playerY>>2;
+	for (i = 0; i < 12; ++i) {
+        // scratch3 = (extendedSpriteData[(i<<2)+1] & SPRITE_SIZE_MASK) == SPRITE_SIZE_NORMAL ? 16 : 8; // TODO: this logic is probably simpler than needed
+        scratch3 = SPRITE_SIZE_NORMAL;
+		// Yes, I'm directly reading values from OAM without so much as a #define. Shut up.
+		scratch4 = *(char*)(0x200 + FIRST_ENEMY_SPRITE_ID+3 + (i<<4));
+		scratch5 = *(char*)(0x200 + FIRST_ENEMY_SPRITE_ID + (i<<4));
+		// Make enemies a touch smaller so they're less likely to be hit by accident.
+		if (extendedSpriteData[(i<<2)] == SPRITE_TYPE_ENEMY) {
+			scratch4 += 5;
+			scratch5 += 5;
+			scratch3 = 6;
+		}
+
+		if (scratch < scratch4 + scratch3 && scratch + PLAYER_WIDTH > scratch4 && 
+			scratch2 < scratch5 + scratch3 && scratch2 + PLAYER_WIDTH > scratch5) {
+			// When we collide... 
+
+			switch (extendedSpriteData[(i<<2)]) {
+				case SPRITE_TYPE_ENEMY: 
+					// TODO: Restart level. You lose!
+
+
+					break;
+
+				case SPRITE_TYPE_GEM:
+		
+					// Mario toad voice "Baaaaii"
+					(*(char*)(0x200 + FIRST_ENEMY_SPRITE_ID + (i<<4))) = 0xff;
+					(*(char*)(0x200 + FIRST_ENEMY_SPRITE_ID + (i<<4)+4)) = 0xff;
+					(*(char*)(0x200 + FIRST_ENEMY_SPRITE_ID + (i<<4)+8)) = 0xff;
+					(*(char*)(0x200 + FIRST_ENEMY_SPRITE_ID + (i<<4)+12)) = 0xff;
+
+                    gemCount++;
+
+					sfx_play(SFX_GEM, 1);
+					update_hud();
+
+
+
+					break;
+
+				default: 
+					// Eh, do nothing. It shall live on.
+					break;
+			}
+		}
+
+	}
 
 }

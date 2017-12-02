@@ -44,6 +44,10 @@ void banked_draw_sprites() {
 		// I'm so, so sorry.
         scratch4 = sprite_data[((currentLevel[MAP_TILE_SIZE + (i<<1)+1])<<2)+1] & SPRITE_PALETTE_MASK;
         
+        if (extendedSpriteData[i<<2] == SPRITE_TYPE_GEM) {
+            ++gemsInLevel;
+        }
+
         if (scratch5 == PLAYER_START_ID) { 
             playerX = scratch << 2;
             playerY = scratch2 << 2;

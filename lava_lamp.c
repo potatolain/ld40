@@ -40,6 +40,7 @@ unsigned int scratchInt;
 unsigned char gemCount;
 unsigned char playerDirection, playerAnimState, playerVelocityLockTime, playerInvulnTime;
 int playerX, playerY, playerXVelocity, playerYVelocity;
+unsigned char gemsInLevel;
 
 #pragma bssseg (pop)
 #pragma dataseg(pop)
@@ -99,8 +100,42 @@ void draw_hud() {
 }
 
 void update_hud() {
-	set_prg_bank(HUD_BANK);
-	banked_update_hud();
+    screenBuffer[0] = MSB(NTADR_A(26, 26));
+    screenBuffer[1] = LSB(NTADR_A(26, 26));
+    screenBuffer[2] = HUD_NUMBERS + gemCount;
+    screenBuffer[3] = MSB(NTADR_A(9, 26));
+    screenBuffer[4] = LSB(NTADR_A(9, 26));
+	screenBuffer[5] = HUD_NUMBERS + ((DEFAULT_SPEED - gemCount) > 0 ? DEFAULT_SPEED - gemCount : 0);
+	// HACK: Find and replace the door
+	if (gemCount == gemsInLevel) {
+		scratchInt = NAMETABLE_A;
+		for (i = 0; i != MAP_TILE_SIZE; ++i) {
+			if ((currentLevel[i] & 0x3f) == TILE_DOOR) {
+				scratchInt = NAMETABLE_A + ((i % 16) << 1) + ((i / 16) << 6);
+				break;
+			}
+		}
+		screenBuffer[6] = MSB(scratchInt);
+		screenBuffer[7] = LSB(scratchInt);
+		screenBuffer[8] = TILE_DOOR_OPEN_ABS;
+		scratchInt += 1;
+		screenBuffer[9] = MSB(scratchInt);
+		screenBuffer[10] = LSB(scratchInt);
+		screenBuffer[11] = TILE_DOOR_OPEN_ABS + 1;
+		scratchInt += 31;		
+		screenBuffer[12] = MSB(scratchInt);
+		screenBuffer[13] = LSB(scratchInt);
+		screenBuffer[14] = TILE_DOOR_OPEN_ABS + 16;
+		scratchInt += 1;
+		screenBuffer[15] = MSB(scratchInt);
+		screenBuffer[16] = LSB(scratchInt);
+		screenBuffer[17] = TILE_DOOR_OPEN_ABS + 17;
+
+		screenBuffer[18] = NT_UPD_EOF;
+	} else {
+		screenBuffer[6] = NT_UPD_EOF;
+	}
+    set_vram_update(screenBuffer);
 }
 
 void draw_sprites() {
@@ -163,7 +198,7 @@ void main(void) {
 				break;
 			case GAME_STATE_POST_START:
 				currentLevelId = 0;
-				playerOverworldPosition = 1;
+				playerOverworldPosition = 0;
 				set_prg_bank(BANK_FIRST_LEVEL+currentLevelId);
 
 				// NOTE: Yes, this says lvl1 - it'll line up with whatever we get though.
@@ -176,10 +211,11 @@ void main(void) {
 				set_chr_bank_1(CHR_BANK_MAIN+1);	
 				
 				// TODO: Move this bit to level instead (make sure to turn off ppu!)
+				// NOTE: Order here is important - hud relies on the draw_sprites method and count
+				gemCount = 0;				
 				draw_level();
-				draw_hud();
 				draw_sprites();
-				gemCount = 0;
+				draw_hud();				
 				// TODO: Nice fade anim into level(s)
 				ppu_on_all();
 				gameState = GAME_STATE_RUNNING;
@@ -197,6 +233,6 @@ void main(void) {
 				put_str(NTADR_A(2,20), "Unknown state encountered");
 				ppu_on_all();
 		}
-		ppu_wait_nmi();
+		ppu_wait_frame();
 	}
 }
