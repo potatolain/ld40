@@ -6,6 +6,7 @@
 #include "src/globals.h"
 #include "src/hud.h"
 #include "src/sprite.h"
+#include "src/movement.h"
 #include "levels/processed/lvl1_tiles.h"
 
 // Suggestion: Define smart names for your banks and use defines like this. 
@@ -28,7 +29,7 @@ const unsigned char spritePalette[16]={ 0x0f,0x00,0x10,0x30,0x0f,0x11,0x21,0x31,
 // Globals! Defined as externs in src/globals.h
 #pragma bssseg (push,"ZEROPAGE")
 #pragma dataseg(push,"ZEROPAGE")
-unsigned char currentPadState;
+unsigned char currentPadState, staticPadState;
 unsigned char i, j;
 int scratch, scratch2, scratch3, scratch4, scratch5;
 unsigned char gameState;
@@ -37,6 +38,9 @@ unsigned char playerOverworldPosition;
 unsigned char currentSpriteId;
 unsigned int scratchInt;
 unsigned char gemCount;
+unsigned char playerDirection, playerAnimState, playerVelocityLockTime, playerInvulnTime;
+int playerX, playerY, playerXVelocity, playerYVelocity;
+
 #pragma bssseg (pop)
 #pragma dataseg(pop)
 
@@ -109,6 +113,24 @@ void update_sprites() {
 	banked_update_sprites();
 }
 
+void do_movement() {
+	set_prg_bank(MOVEMENT_BANK);
+	banked_do_movement();
+}
+
+void do_sprite_collision() {
+	set_prg_bank(MOVEMENT_BANK);
+	banked_do_sprite_collision();
+}
+
+unsigned char test_collision(unsigned char tileId, unsigned char isPlayer) {
+	char temp = tileId & 0x3f;
+	if (temp > 7 && temp < 16) {
+		return 1;
+	}
+	return 0;
+}
+
 // Main entry point for the application.
 void main(void) {
 
@@ -141,7 +163,7 @@ void main(void) {
 				break;
 			case GAME_STATE_POST_START:
 				currentLevelId = 0;
-				playerOverworldPosition = 0;
+				playerOverworldPosition = 1;
 				set_prg_bank(BANK_FIRST_LEVEL+currentLevelId);
 
 				// NOTE: Yes, this says lvl1 - it'll line up with whatever we get though.
@@ -163,9 +185,12 @@ void main(void) {
 				gameState = GAME_STATE_RUNNING;
 				break;
 			case GAME_STATE_RUNNING:
+				staticPadState = pad_trigger(0);		
+				currentPadState = pad_state(0);
+				do_movement();
 
 				break;
-			case GAME_STATE_PAUSED:
+			case GAME_STATE_PAUSE:
 				break;
 			default:
 				ppu_off();

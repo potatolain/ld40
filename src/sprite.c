@@ -29,12 +29,12 @@ void banked_draw_sprites() {
 
 	for (i = 0; i < 12 && currentLevel[MAP_TILE_SIZE + (i<<1)] != 255; ++i) {
 		scratch = currentLevel[MAP_TILE_SIZE + (i<<1)];
-		scratch2 = currentLevel[MAP_TILE_SIZE + (i<<1)+1];
+		scratch5 = currentLevel[MAP_TILE_SIZE + (i<<1)+1];
 
-		extendedSpriteData[(i<<2)  ] = sprite_data[(scratch2<<2)];
-		extendedSpriteData[(i<<2)+1] = sprite_data[(scratch2<<2)+1];
-		extendedSpriteData[(i<<2)+2] = sprite_data[(scratch2<<2)+2];
-		extendedSpriteData[(i<<2)+3] = sprite_data[(scratch2<<2)+3];
+		extendedSpriteData[(i<<2)  ] = sprite_data[(scratch5<<2)];
+		extendedSpriteData[(i<<2)+1] = sprite_data[(scratch5<<2)+1];
+		extendedSpriteData[(i<<2)+2] = sprite_data[(scratch5<<2)+2];
+		extendedSpriteData[(i<<2)+3] = sprite_data[(scratch5<<2)+3];
 
         // Scratch 1 is the position. Need to do some hax to get it to 16x16 coords
         // Why -1? Seems to align things to tiles, never figured that out in detail. Game jams make me do bad things >_>
@@ -44,7 +44,9 @@ void banked_draw_sprites() {
 		// I'm so, so sorry.
         scratch4 = sprite_data[((currentLevel[MAP_TILE_SIZE + (i<<1)+1])<<2)+1] & SPRITE_PALETTE_MASK;
         
-        if (scratch2 == PLAYER_START_ID) { 
+        if (scratch5 == PLAYER_START_ID) { 
+            playerX = scratch << 2;
+            playerY = scratch2 << 2;
             // Just hide me, then set the params for the player's starting position.
             oam_spr(NESLIB_SPRITE_GONE, NESLIB_SPRITE_GONE, scratch3, scratch4, FIRST_ENEMY_SPRITE_ID + (i << 4));
             oam_spr(NESLIB_SPRITE_GONE, NESLIB_SPRITE_GONE, scratch3+1, scratch4, (FIRST_ENEMY_SPRITE_ID + 4) + (i << 4));

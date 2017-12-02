@@ -1,6 +1,6 @@
 // This file defines globals that can be used all over. You'll want common things in here, as the NES has very, very
 // limited ram. 
-extern unsigned char currentPadState;
+extern unsigned char currentPadState, staticPadState;
 extern unsigned char i, j;
 extern int scratch, scratch2, scratch3, scratch4, scratch5;
 extern unsigned char gameState;
@@ -9,6 +9,8 @@ extern unsigned char playerOverworldPosition;
 extern unsigned int scratchInt;
 extern unsigned char gemCount;
 extern unsigned char currentSpriteId;
+extern unsigned char playerDirection, playerAnimState, playerVelocityLockTime, playerInvulnTime;
+extern int playerX, playerY, playerXVelocity, playerYVelocity;
 
 extern char currentLevel[256];
 extern char screenBuffer[48];
@@ -23,6 +25,8 @@ extern const unsigned char BYTE_TO_BIT[8];
 extern const char lvl_details[4];
 
 void put_str(unsigned int adr, const char *str);
+unsigned char test_collision(unsigned char tileId, unsigned char isPlayer);
+void do_sprite_collision();
 
 // Crappy macro to get absolute value in an absolutely disgusting way
 #define abs(x) (x > 0 ? x : 0-x)
@@ -36,11 +40,13 @@ void put_str(unsigned int adr, const char *str);
 
 #define GAME_STATE_RUNNING 0
 #define GAME_STATE_POST_START 1
-#define GAME_STATE_PAUSED 100
+#define GAME_STATE_PAUSE 100
 #define GAME_STATE_TITLE 201
 #define GAME_STATE_INIT 200
 
-#define DEFAULT_SPEED 5
+#define PLAYER_SPRITE_TILE 0x60
+
+#define DEFAULT_SPEED 16
 
 #define HUD_BLANK 0xff
 #define HUD_NUMBERS 0xf3
@@ -61,7 +67,24 @@ void put_str(unsigned int adr, const char *str);
 #define PLAYER_SPRITE_ID 0x10
 #define FIRST_ENEMY_SPRITE_ID 0x20
 
+#define PLAYER_DIRECTION_LEFT 0x24
+#define PLAYER_DIRECTION_RIGHT 0x20
+#define PLAYER_DIRECTION_UP 4
+#define PLAYER_DIRECTION_DOWN 0
+#define PLAYER_SPRITE_EMPTY 0xee
+
+#define PLAYER_VELOCITY 4
+#define PLAYER_MAX_VELOCITY 8
+#define PLAYER_VELOCITY_ACCEL 1
+
+#define PLAYER_WIDTH 16
+#define PLAYER_HEIGHT 16
+
+
+#define SFX_PAUSE 0
+
 #pragma zpsym ("currentPadState")
+#pragma zpsym ("staticPadState")
 #pragma zpsym ("i")
 #pragma zpsym ("j")
 #pragma zpsym ("scratchInt")
@@ -75,3 +98,10 @@ void put_str(unsigned int adr, const char *str);
 #pragma zpsym ("playerOverworldPosition")
 #pragma zpsym ("gemCount")
 #pragma zpsym ("currentSpriteId")
+#pragma zpsym ("playerX")
+#pragma zpsym ("playerY")
+#pragma zpsym ("playerDirection")
+#pragma zpsym ("playerAnimState")
+#pragma zpsym ("playerXVelocity")
+#pragma zpsym ("playerYVelocity")
+#pragma zpsym ("playerVelocityLockTime")
