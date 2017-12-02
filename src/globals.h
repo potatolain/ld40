@@ -37,6 +37,8 @@ void animate_fadein(unsigned char _delay);
 #define abs(x) (x > 0 ? x : 0-x)
 
 #define SHOW_VERSION_INFO 1 
+#define DEBUG 1
+#define FIRST_LEVEL 0
 
 #define BANK_FIRST_LEVEL 2
 
@@ -46,6 +48,7 @@ void animate_fadein(unsigned char _delay);
 #define GAME_STATE_RUNNING 0
 #define GAME_STATE_POST_START 1
 #define GAME_STATE_LEVEL_START 10
+#define GAME_STATE_LEVEL_LOST 40
 #define GAME_STATE_LEVEL_COMPLETE 50
 #define GAME_STATE_PAUSE 100
 #define GAME_STATE_TITLE 201
@@ -72,6 +75,13 @@ void animate_fadein(unsigned char _delay);
 #define HUD_A 0xec
 #define HUD_U 0xed
 #define HUD_P 0xfd
+#define HUD_ARROW 0xa8
+#define HUD_R 0xa9
+#define HUD_T 0xaa
+#define HUD_C 0xab
+#define HUD_O 0xac
+#define HUD_N 0xad
+#define HUD_I 0xae
 
 #define MAP_TILE_SIZE 192
 
@@ -99,6 +109,12 @@ void animate_fadein(unsigned char _delay);
 #define SFX_PAUSE_UP 2
 #define SFX_PAUSE_DOWN 1
 #define SFX_GEM 3
+#define SFX_PAUSE_SWAP 4
+#define SFX_DEAD 5
+
+#define SONG_DUMB 0
+#define SONG_DEAD 1
+#define SONG_COMPLETE 2
 
 #pragma zpsym ("currentPadState")
 #pragma zpsym ("staticPadState")

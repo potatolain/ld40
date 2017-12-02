@@ -1,6 +1,8 @@
 #include "lib/neslib.h"
 #include "src/globals.h"
-
+#include "src/sprite.h"
+#pragma rodataseg ("ROM_00")
+#pragma codeseg ("ROM_00")
 
 void banked_draw_hud() {
     // Presumes ppu is already off.
@@ -51,16 +53,17 @@ void banked_draw_pause() {
 	set_vram_update(NULL); // STOP HELPING, ENGINE
     vram_adr(NAMETABLE_C + 0x03c0);
     vram_fill(0xaa, 0x40);
-	oam_clear();
 
 	vram_adr(NTADR_C(6, 11));
 	vram_put(HUD_TL);
 	vram_fill(HUD_H, 16);
-	vram_put(HUD_TR);
+    vram_put(HUD_TR);
+    
 	vram_adr(NTADR_C(6, 12));
 	vram_put(HUD_V);
 	vram_fill(HUD_BLANK, 16);
-	vram_put(HUD_V);
+    vram_put(HUD_V);
+    
 	vram_adr(NTADR_C(6, 13));
 	vram_put(HUD_V);
     vram_fill(HUD_BLANK, 5);
@@ -71,12 +74,51 @@ void banked_draw_pause() {
     vram_put(HUD_E);
     vram_put(HUD_D);
     vram_fill(HUD_BLANK, 5);
-	vram_put(HUD_V);
+    vram_put(HUD_V);
+    
 	vram_adr(NTADR_C(6, 14));
 	vram_put(HUD_V);
 	vram_fill(HUD_BLANK, 16);
+    vram_put(HUD_V);
+
+    vram_adr(NTADR_C(6, 15));
 	vram_put(HUD_V);
-	vram_adr(NTADR_C(6, 15));
+	vram_fill(HUD_BLANK, 16);
+    vram_put(HUD_V);
+
+    
+    vram_adr(NTADR_C(6, 16));
+    vram_put(HUD_V);
+    vram_fill(HUD_BLANK, 4);
+    vram_put(HUD_C);
+    vram_put(HUD_O);
+    vram_put(HUD_N);
+    vram_put(HUD_T);
+    vram_put(HUD_I);
+    vram_put(HUD_N);
+    vram_put(HUD_U);
+    vram_put(HUD_E);
+    vram_fill(HUD_BLANK, 4);
+    vram_put(HUD_V);
+
+    vram_adr(NTADR_C(6, 17));
+    vram_put(HUD_V);
+    vram_fill(HUD_BLANK, 4);
+    vram_put(HUD_R);
+    vram_put(HUD_E);
+    vram_put(HUD_GEMS+3);
+    vram_put(HUD_E);
+    vram_put(HUD_T);
+    vram_fill(HUD_BLANK, 7);
+    vram_put(HUD_V);
+
+
+    vram_adr(NTADR_C(6, 18));
+    vram_put(HUD_V);
+    vram_fill(HUD_BLANK, 16);
+    vram_put(HUD_V);
+
+	vram_adr(NTADR_C(6, 19));
 	vram_put(HUD_BL);
 	vram_fill(HUD_H, 16);
 	vram_put(HUD_BR);
@@ -84,11 +126,37 @@ void banked_draw_pause() {
 }
 
 void banked_do_pause() {
+    scratch = 0;
     while(1) {
-        if (pad_trigger(0) & PAD_START) {
+        scratch2 = pad_trigger(0);
+        if (scratch == 0 && scratch2 & PAD_DOWN) {
+            scratch = 1;
+            sfx_play(SFX_PAUSE_SWAP, 2);
+        }
+        if (scratch == 1 && scratch2 & PAD_UP) {
+            scratch = 0;
+            sfx_play(SFX_PAUSE_SWAP, 2);
+        }
+
+        screenBuffer[0] = MSB(NTADR_C(8, 16));
+        screenBuffer[1] = LSB(NTADR_C(8, 16));
+        screenBuffer[2] = scratch ? HUD_BLANK : HUD_ARROW;
+        screenBuffer[3] = MSB(NTADR_C(8, 17));
+        screenBuffer[4] = LSB(NTADR_C(8, 17));
+        screenBuffer[5] = scratch ? HUD_ARROW : HUD_BLANK;
+        screenBuffer[6] = NT_UPD_EOF;
+        set_vram_update(screenBuffer);
+
+        if (scratch2 & PAD_START) {
             sfx_play(SFX_PAUSE_DOWN, 2);
             break;
         }
         ppu_wait_frame();
+    }
+    set_vram_update(NULL);
+    if (scratch) {
+        gameState = GAME_STATE_LEVEL_START;
+    } else {
+        gameState = GAME_STATE_RUNNING;
     }
 }

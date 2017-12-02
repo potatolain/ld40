@@ -4,14 +4,19 @@
 
 #define PLAYER_START_ID 0
 
+#pragma rodataseg ("ROM_01")
+#pragma codeseg ("ROM_01")
+
 const unsigned char sprite_data[] = {
 	// Player Start
 	SPRITE_TYPE_IGNORED, SPRITE_SIZE_NORMAL | SPRITE_PALETTE_1 | SPRITE_ANIM_NONE, 0xee, 0,
     // Gem
     // TODO: animate? (Or maybe we just chr swap)
 	SPRITE_TYPE_GEM, SPRITE_SIZE_NORMAL | SPRITE_PALETTE_2 | SPRITE_ANIM_NONE, 0x00, SPRITE_DIRECTION_DOWN,
-	// Some enemy, TBD
-	SPRITE_TYPE_ENEMY, SPRITE_SIZE_NORMAL | SPRITE_PALETTE_3 | SPRITE_ANIM_DEFAULT, 0x80, 0,
+	// Alien
+    SPRITE_TYPE_ENEMY, SPRITE_SIZE_NORMAL | SPRITE_PALETTE_3 | SPRITE_ANIM_FULL, 0x68, 3,
+    // Fast freakin' alien
+    SPRITE_TYPE_ENEMY, SPRITE_SIZE_NORMAL | SPRITE_PALETTE_2 | SPRITE_ANIM_FULL, 0x68, 6,
 };
 
 static char sprite_directions[12];
@@ -19,13 +24,10 @@ static char sprite_direction_time[12];
 
 
 void banked_draw_sprites() {
-    // TODO: Figure out how to track enemy movement in this game.
-    /*
 	for (i = 0; i < 12; i++) {
-		sprite_directions[i] = SPRITE_DIRECTION_UNDEF;
-		sprite_direction_time[i] = SPRITE_MIN_DIRECTION_TIME-10;
+        sprite_directions[i] = SPRITE_DIRECTION_UNDEF;
+		sprite_direction_time[i] = 0;
     }
-    */
 
 	for (i = 0; i < 12 && currentLevel[MAP_TILE_SIZE + (i<<1)] != 255; ++i) {
 		scratch = currentLevel[MAP_TILE_SIZE + (i<<1)];
@@ -69,5 +71,5 @@ void banked_draw_sprites() {
 }
 
 void banked_update_sprites() {
-
+    
 }

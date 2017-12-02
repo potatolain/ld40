@@ -18,8 +18,6 @@
 #define CHR_BANK_0 0
 #define CHR_BANK_1 2 // NOTE: We have two copies of the same 4k data in the 8k .chr files (because I'm lazy, ok?) so we use bank 2 to get the inverted one.
 
-#define DUMMY_SONG 0
-
 const unsigned char levelPalette[16]={ 0x0f,0x00,0x10,0x30,0x0f,0x11,0x21,0x31,0x0f,0x05,0x15,0x25,0x0f,0x09,0x19,0x29 };
 const unsigned char spritePalette[16]={ 0x0f,0x00,0x10,0x30,0x0f,0x11,0x21,0x31,0x0f,0x05,0x15,0x25,0x0f,0x09,0x19,0x29 };
 
@@ -189,6 +187,15 @@ void draw_pause() {
 	banked_draw_pause();
 }
 
+void draw_dead() {
+	set_prg_bank(TITLE_BANK);
+	banked_draw_dead();
+}
+void do_dead() {
+	set_prg_bank(TITLE_BANK);
+	banked_do_dead();
+}
+
 void draw_sprites() {
 	set_prg_bank(SPRITE_BANK);
 	banked_draw_sprites();
@@ -226,10 +233,6 @@ void main(void) {
 	playMusic = 0;
 	mirrorMode = MIRROR_HORIZONTAL;
 
-	// Queue up our dummy song and start playing it.
-	music_play(DUMMY_SONG);
-	music_pause(playMusic);
-
 	pal_col(1,0x19);//set dark green color
 	pal_col(17,0x19);
 	scroll(0, 0);
@@ -252,11 +255,13 @@ void main(void) {
 				break;
 			case GAME_STATE_POST_START:
 				currentLevelId = 0;
-				playerOverworldPosition = 0;
+				playerOverworldPosition = FIRST_LEVEL;
 				gameState = GAME_STATE_LEVEL_START;
 				break;
 			case GAME_STATE_LEVEL_START: 
 				animate_fadeout(5);
+				scroll(0, 0);				
+				gemsInLevel = 0;
 				set_prg_bank(BANK_FIRST_LEVEL+currentLevelId);
 
 				// NOTE: Yes, this says lvl1 - it'll line up with whatever we get though.
@@ -281,6 +286,8 @@ void main(void) {
 				ppu_on_all();
 				animate_fadein(5);
 				gameState = GAME_STATE_RUNNING;
+				music_play(SONG_DUMB);
+				music_pause(0);
 				break;
 			
 			case GAME_STATE_RUNNING:
@@ -289,8 +296,15 @@ void main(void) {
 				do_movement();
 
 				break;
+			case GAME_STATE_LEVEL_LOST:
+				animate_fadeout(5);
+				draw_dead();
+				animate_fadein(5);
+				do_dead();
+				gameState = GAME_STATE_LEVEL_START;
+				break;
 			case GAME_STATE_LEVEL_COMPLETE:
-
+				music_play(SONG_COMPLETE);			
 				animate_fadeout(5);
 				show_level_complete();
 				animate_fadein(5);
@@ -300,17 +314,21 @@ void main(void) {
 				break;
 			case GAME_STATE_PAUSE:
 				animate_fadeout(5);
+				music_pause(1);
 				ppu_off();
 				draw_pause();
 				scroll(0, 240);
 				ppu_on_bg();
 				animate_fadein(5);
 				do_pause();
-				animate_fadeout(5);
-				scroll(0, 0);
-				ppu_on_all();
-				animate_fadein(5);
-				gameState = GAME_STATE_RUNNING;
+				// If you did reset, the level stuff will take care of this for you.
+				if (gameState == GAME_STATE_RUNNING) {
+					animate_fadeout(5);
+					scroll(0, 0);
+					ppu_on_all();
+					animate_fadein(5);
+					music_pause(0);
+				}
 				break;
 			default:
 				ppu_off();

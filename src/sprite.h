@@ -1,4 +1,4 @@
-#define SPRITE_BANK 0
+#define SPRITE_BANK 1
 
 #define SPRITE_PALETTE_0 0
 #define SPRITE_PALETTE_1 1

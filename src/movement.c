@@ -2,6 +2,8 @@
 #include "lib/neslib.h"
 #include "src/sprite.h"
 #include "src/movement.h"
+#pragma rodataseg ("ROM_00")
+#pragma codeseg ("ROM_00")
 
 unsigned int get_bunny_speed() {
     switch (gemCount) {
@@ -202,7 +204,7 @@ void banked_do_sprite_collision() {
 	scratch2 = playerY>>2;
 	for (i = 0; i < 12; ++i) {
         // scratch3 = (extendedSpriteData[(i<<2)+1] & SPRITE_SIZE_MASK) == SPRITE_SIZE_NORMAL ? 16 : 8; // TODO: this logic is probably simpler than needed
-        scratch3 = SPRITE_SIZE_NORMAL;
+        scratch3 = 16;
 		// Yes, I'm directly reading values from OAM without so much as a #define. Shut up.
 		scratch4 = *(char*)(0x200 + FIRST_ENEMY_SPRITE_ID+3 + (i<<4));
 		scratch5 = *(char*)(0x200 + FIRST_ENEMY_SPRITE_ID + (i<<4));
@@ -218,10 +220,11 @@ void banked_do_sprite_collision() {
 			// When we collide... 
 
 			switch (extendedSpriteData[(i<<2)]) {
-				case SPRITE_TYPE_ENEMY: 
-					// TODO: Restart level. You lose!
-
-
+                case SPRITE_TYPE_ENEMY: 
+                
+					// Restart level. You lose!
+                    music_play(SONG_DEAD);
+                    gameState = GAME_STATE_LEVEL_LOST;
 					break;
 
 				case SPRITE_TYPE_GEM:
