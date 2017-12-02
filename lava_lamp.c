@@ -2,8 +2,10 @@
 #include "lib/boilerplate.h"
 #include "bin/build_info.h"
 #include "src/title.h"
-#include "src/rom_1.h"
+#include "src/level.h"
 #include "src/globals.h"
+#include "src/hud.h"
+#include "levels/processed/lvl1_tiles.h"
 
 // Suggestion: Define smart names for your banks and use defines like this. 
 // This is just to make a clear example, and I didn't want to suggest using bank #s directly.
@@ -23,18 +25,27 @@ const unsigned char spritePalette[16]={ 0x0f,0x00,0x10,0x30,0x0f,0x01,0x21,0x31,
 
 
 // Globals! Defined as externs in src/globals.h
+#pragma bssseg (push,"ZEROPAGE")
+#pragma dataseg(push,"ZEROPAGE")
 unsigned char currentPadState;
-unsigned char i, j, scratch;
+unsigned char i, j;
+int scratch, scratch2, scratch3, scratch4, scratch5;
 unsigned char gameState;
-char currentMessage[16];
-unsigned char currentLevel;
+unsigned char currentLevelId;
+unsigned char playerOverworldPosition;
+unsigned int scratchInt;
+unsigned char gemCount;
+#pragma bssseg (pop)
+#pragma dataseg(pop)
+
+char currentLevel[256];
 
 // Local to this file.
-static unsigned char showMessageA;
 static unsigned char playMusic;
 static unsigned char chrBank;
 static unsigned char mirrorMode;
 static char screenBuffer[48];
+
 
 // Put a string on the screen at X/Y coordinates given in adr.
 void put_str(unsigned int adr, const char *str) {
@@ -65,10 +76,24 @@ void do_title() {
 	banked_do_title();
 }
 
+void draw_level() {
+	set_prg_bank(LEVEL_BANK);
+	banked_draw_level();
+}
+
+void draw_hud() {
+	set_prg_bank(HUD_BANK);
+	banked_draw_hud();
+}
+
+void update_hud() {
+	set_prg_bank(HUD_BANK);
+	banked_update_hud();
+}
+
 // Main entry point for the application.
 void main(void) {
 
-	showMessageA = 0;
 	playMusic = 0;
 	mirrorMode = MIRROR_HORIZONTAL;
 
@@ -95,10 +120,23 @@ void main(void) {
 				do_title();
 				break;
 			case GAME_STATE_POST_START:
-				currentLevel = 0;
+				currentLevelId = 0;
+				playerOverworldPosition = 1;
+				set_prg_bank(BANK_FIRST_LEVEL+currentLevelId);
+
+				// NOTE: Yes, this says lvl1 - it'll line up with whatever we get though.
+				memcpy(currentLevel, lvl1 + (playerOverworldPosition << 8), 256);
+
 				ppu_off();
 				pal_bg(levelPalette);
 				pal_spr(spritePalette);
+				set_chr_bank_0(CHR_BANK_MAIN);
+				set_chr_bank_1(CHR_BANK_MAIN+1);	
+				
+				// TODO: Move this bit to level instead (make sure to turn off ppu!)
+				draw_level();
+				draw_hud();
+				gemCount = 0;
 				// TODO: Nice fade anim into level(s)
 				ppu_on_all();
 				gameState = GAME_STATE_RUNNING;

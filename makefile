@@ -7,7 +7,7 @@
 ### USER EDITABLE STUFF STARTS HERE
 
 ROM_NAME=lava_lamp
-OBJECTS_TO_BUILD=$(ROM_NAME).c bin/build_info.h levels/processed/lvl1_tiles.asm bin/crt0.o bin/$(ROM_NAME).o bin/title.o bin/rom_1.o
+OBJECTS_TO_BUILD=$(ROM_NAME).c bin/build_info.h levels/processed/lvl1_tiles.asm bin/crt0.o bin/$(ROM_NAME).o bin/title.o bin/level.o bin/hud.o
 
 ROOT_DIR:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 MAIN_COMPILER=./tools/cc65/bin/cc65

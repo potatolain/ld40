@@ -10,6 +10,10 @@ const unsigned char titlePalette[16]={ 0x0f,0x01,0x21,0x31,0x0f,0x01,0x21,0x31,0
 void banked_draw_title() {
 	ppu_off();
 	pal_bg(titlePalette);
+
+	set_chr_bank_0(CHR_BANK_TITLE);
+	set_chr_bank_1(CHR_BANK_TITLE+1);
+
 	// Show a message to the user.
 	put_str(NTADR_A(2,8), "No Name Yet");
 	put_str(NTADR_A(2,12), "Ludum Dare 40 Entry");
