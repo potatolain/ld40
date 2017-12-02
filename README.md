@@ -2,6 +2,9 @@
 
 Some NES thingie. To be determined. Probably 80s+space themed.
 
+[Download](http://cpprograms.net/devnull/circleci-redirect.php?namespace=cppchriscpp&project=ld40&file=lava_lamp.nes)
+[Play](http://cpprograms.net/classic-gaming/ld40/)
+
 # Credits
 
 [NESLib](https://shiru.untergrund.net/software.shtml) by [Shiru](http://shiru.untergrund.net/)
