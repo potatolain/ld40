@@ -45,7 +45,7 @@ void banked_draw_hud() {
     vram_put(HUD_D);
     vram_put(HUD_COLON);
     vram_put(HUD_NUMBERS);
-    vram_put(HUD_NUMBERS + ((DEFAULT_SPEED - gemCount) > 0 ? DEFAULT_SPEED - gemCount : 0));
+    vram_put(HUD_NUMBERS + ((DEFAULT_SPEED - gemCount - antiGemCount) > 0 ? DEFAULT_SPEED - gemCount - antiGemCount : 0));
 
 }
 

@@ -7,7 +7,7 @@ extern unsigned char gameState;
 extern unsigned char currentLevelId;
 extern unsigned char playerOverworldPosition;
 extern unsigned int scratchInt;
-extern unsigned char gemCount;
+extern unsigned char gemCount, antiGemCount;
 extern unsigned char currentSpriteId;
 extern unsigned char playerDirection, playerAnimState, playerVelocityLockTime, playerInvulnTime;
 extern int playerX, playerY, playerXVelocity, playerYVelocity;
@@ -42,7 +42,7 @@ char* itoa(int i, char b[]);
 #define SHOW_VERSION_INFO 1 
 #define DEBUG 1
 #define FIRST_LEVEL 0
-#define LAST_LEVEL 3
+#define LAST_LEVEL 12
 
 #define BANK_FIRST_LEVEL 2
 
@@ -115,7 +115,7 @@ char* itoa(int i, char b[]);
 #define SFX_PAUSE_DOWN 1
 #define SFX_GEM 3
 #define SFX_PAUSE_SWAP 4
-#define SFX_DEAD 5
+#define SFX_ANTI_GEM 5
 
 #define LEVEL_COMPLETE_WAIT_TIME 60
 
@@ -137,6 +137,7 @@ char* itoa(int i, char b[]);
 #pragma zpsym ("currentLevelId")
 #pragma zpsym ("playerOverworldPosition")
 #pragma zpsym ("gemCount")
+#pragma zpsym ("antiGemCount")
 #pragma zpsym ("currentSpriteId")
 #pragma zpsym ("playerX")
 #pragma zpsym ("playerY")

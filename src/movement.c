@@ -6,7 +6,7 @@
 #pragma codeseg ("ROM_00")
 
 unsigned int get_bunny_speed() {
-    switch (gemCount) {
+    switch (gemCount + antiGemCount) {
         case 6:
             return 0;
         case 5: 
@@ -24,7 +24,7 @@ unsigned int get_bunny_speed() {
     }
 }
 unsigned char get_lock_time() {
-    switch (gemCount) {
+    switch (gemCount + antiGemCount) {
         case 6:
             return 0;
         case 5: 
@@ -208,7 +208,7 @@ void banked_do_sprite_collision() {
 	scratch2 = playerY>>2;
 	for (i = 0; i < 12; ++i) {
         // scratch3 = (extendedSpriteData[(i<<2)+1] & SPRITE_SIZE_MASK) == SPRITE_SIZE_NORMAL ? 16 : 8; // TODO: this logic is probably simpler than needed
-        scratch3 = 16;
+        scratch3 = SPRITE_WIDTH;
 		// Yes, I'm directly reading values from OAM without so much as a #define. Shut up.
 		scratch4 = *(char*)(0x200 + FIRST_ENEMY_SPRITE_ID+3 + (i<<4));
 		scratch5 = *(char*)(0x200 + FIRST_ENEMY_SPRITE_ID + (i<<4));
@@ -244,7 +244,21 @@ void banked_do_sprite_collision() {
 					sfx_play(SFX_GEM, 1);
 					update_hud();
 
+                    break;
 
+                case SPRITE_TYPE_ANTI_GEM:
+                    
+                    // Mario toad voice "Baaaaii"
+                    (*(char*)(0x200 + FIRST_ENEMY_SPRITE_ID + (i<<4))) = 0xff;
+                    (*(char*)(0x200 + FIRST_ENEMY_SPRITE_ID + (i<<4)+4)) = 0xff;
+                    (*(char*)(0x200 + FIRST_ENEMY_SPRITE_ID + (i<<4)+8)) = 0xff;
+                    (*(char*)(0x200 + FIRST_ENEMY_SPRITE_ID + (i<<4)+12)) = 0xff;
+
+                    antiGemCount++;
+
+                    sfx_play(SFX_ANTI_GEM, 1);
+                    update_hud();
+            
 
 					break;
 

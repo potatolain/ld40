@@ -33,7 +33,7 @@ unsigned char currentLevelId;
 unsigned char playerOverworldPosition;
 unsigned char currentSpriteId;
 unsigned int scratchInt;
-unsigned char gemCount;
+unsigned char gemCount, antiGemCount;
 unsigned char playerDirection, playerAnimState, playerVelocityLockTime, playerInvulnTime;
 unsigned int deathCounter;
 int playerX, playerY, playerXVelocity, playerYVelocity;
@@ -177,7 +177,7 @@ void update_hud() {
     screenBuffer[2] = HUD_NUMBERS + gemCount;
     screenBuffer[3] = MSB(NTADR_A(9, 26));
     screenBuffer[4] = LSB(NTADR_A(9, 26));
-	screenBuffer[5] = HUD_NUMBERS + ((DEFAULT_SPEED - gemCount) > 0 ? DEFAULT_SPEED - gemCount : 0);
+	screenBuffer[5] = HUD_NUMBERS + ((DEFAULT_SPEED - gemCount - antiGemCount) > 0 ? DEFAULT_SPEED - gemCount - antiGemCount : 0);
 	// HACK: Find and replace the door
 	if (gemCount == gemsInLevel) {
 		scratchInt = NAMETABLE_A;
@@ -188,21 +188,23 @@ void update_hud() {
 				break;
 			}
 		}
-		screenBuffer[6] = MSB(scratchInt);
-		screenBuffer[7] = LSB(scratchInt);
-		screenBuffer[8] = TILE_DOOR_OPEN_ABS;
-		scratchInt += 1;
-		screenBuffer[9] = MSB(scratchInt);
-		screenBuffer[10] = LSB(scratchInt);
-		screenBuffer[11] = TILE_DOOR_OPEN_ABS + 1;
-		scratchInt += 31;		
-		screenBuffer[12] = MSB(scratchInt);
-		screenBuffer[13] = LSB(scratchInt);
-		screenBuffer[14] = TILE_DOOR_OPEN_ABS + 16;
-		scratchInt += 1;
-		screenBuffer[15] = MSB(scratchInt);
-		screenBuffer[16] = LSB(scratchInt);
-		screenBuffer[17] = TILE_DOOR_OPEN_ABS + 17;
+		if (scratchInt != NAMETABLE_A) {
+			screenBuffer[6] = MSB(scratchInt);
+			screenBuffer[7] = LSB(scratchInt);
+			screenBuffer[8] = TILE_DOOR_OPEN_ABS;
+			scratchInt += 1;
+			screenBuffer[9] = MSB(scratchInt);
+			screenBuffer[10] = LSB(scratchInt);
+			screenBuffer[11] = TILE_DOOR_OPEN_ABS + 1;
+			scratchInt += 31;		
+			screenBuffer[12] = MSB(scratchInt);
+			screenBuffer[13] = LSB(scratchInt);
+			screenBuffer[14] = TILE_DOOR_OPEN_ABS + 16;
+			scratchInt += 1;
+			screenBuffer[15] = MSB(scratchInt);
+			screenBuffer[16] = LSB(scratchInt);
+			screenBuffer[17] = TILE_DOOR_OPEN_ABS + 17;
+		}
 
 		screenBuffer[18] = NT_UPD_EOF;
 	} else {
@@ -265,8 +267,18 @@ unsigned char test_collision(unsigned char tileId, unsigned char isPlayer) {
 	if (temp > 7 && temp < 16) {
 		return 1;
 	}
+	if (temp > 19 && temp < 23) {
+		return 1;
+	}
 	if (isPlayer && temp == TILE_DOOR_OPEN) {
-		gameState = GAME_STATE_LEVEL_COMPLETE;
+		// HACK- make sure we're aligned to the grid before we ok it
+		if (
+			((playerDirection == PLAYER_DIRECTION_LEFT || playerDirection == PLAYER_DIRECTION_RIGHT ) && (playerX >> 2) % 16 > 6 && (playerX >> 2) % 16 < 10) ||
+			((playerDirection == PLAYER_DIRECTION_UP || playerDirection == PLAYER_DIRECTION_DOWN ) && (playerY >> 2) % 16 > 6 && (playerY >> 2) % 16 < 10)
+			
+		) { 
+			gameState = GAME_STATE_LEVEL_COMPLETE;
+		}
 	}
 	return 0;
 }
@@ -320,7 +332,8 @@ void main(void) {
 				
 				// TODO: Move this bit to level instead (make sure to turn off ppu!)
 				// NOTE: Order here is important - hud relies on the draw_sprites method and count
-				gemCount = 0;		
+				gemCount = 0;
+				antiGemCount = 0;		
 				playerXVelocity = 0;
 				playerYVelocity = 0;
 				playerVelocityLockTime = 0;		

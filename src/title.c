@@ -250,7 +250,7 @@ void banked_draw_win() {
 	put_str(NTADR_A(8, 2), "Congratulations!");
 	put_str(NTADR_A(6,5),  "Our hero was able to");
 	put_str(NTADR_A(6,6), "return home safely");
-	put_str(NTADR_A(6,7), "thanks to your quick");
+	put_str(NTADR_A(6,7), "thanks to your");
 	put_str(NTADR_A(6,8), "quick thinking!");
 
 	put_str(NTADR_A(6,10), "Your quest is now");

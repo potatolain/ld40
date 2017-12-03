@@ -16,6 +16,7 @@
 #define SPRITE_TYPE_IGNORED 0x11
 #define SPRITE_TYPE_ENEMY 0x12
 #define SPRITE_TYPE_GEM 0x13
+#define SPRITE_TYPE_ANTI_GEM 0x10
 
 #define SPRITE_PALETTE_MASK 0x03
 #define SPRITE_ANIM_MASK 0x30
@@ -27,10 +28,10 @@
 #define NESLIB_SPRITE_GONE 0xf0
 
 // TODO: Do we wanna be smarter about sprite size?
-#define SPRITE_WIDTH 12
-#define SPRITE_HEIGHT 12
-#define SPRITE_X_FUZZ 2
-#define SPRITE_Y_FUZZ 2
+#define SPRITE_WIDTH 10
+#define SPRITE_HEIGHT 10
+#define SPRITE_X_FUZZ 3
+#define SPRITE_Y_FUZZ 3
 
 
 void banked_draw_sprites();
