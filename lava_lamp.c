@@ -308,6 +308,7 @@ void main(void) {
 			case GAME_STATE_INIT:
 
 				gameState = GAME_STATE_TITLE;
+				music_play(SONG_TITLE);
 				draw_title();
 				break;
 			case GAME_STATE_TITLE:
@@ -315,6 +316,7 @@ void main(void) {
 
 				break;
 			case GAME_STATE_POST_START:
+				music_pause(1);
 				draw_instructions();
 				do_instructions();
 				currentLevelId = 0;

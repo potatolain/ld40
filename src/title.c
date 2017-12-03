@@ -36,15 +36,15 @@ void banked_draw_title() {
 	currentSpriteId = oam_spr(22<<3, 11<<3, 0x9c, 3, currentSpriteId);
 	currentSpriteId = oam_spr(23<<3, 11<<3, 0x9d, 3, currentSpriteId);
 
-	currentSpriteId = oam_spr(14<<3, 14<<3, 0xac, 0, currentSpriteId);
-	currentSpriteId = oam_spr(15<<3, 14<<3, 0xad, 0, currentSpriteId);
-	currentSpriteId = oam_spr(14<<3, 15<<3, 0xbc, 0, currentSpriteId);
-	currentSpriteId = oam_spr(15<<3, 15<<3, 0xbd, 0, currentSpriteId);
+	currentSpriteId = oam_spr(12<<3, 14<<3, 0xac, 0, currentSpriteId);
+	currentSpriteId = oam_spr(13<<3, 14<<3, 0xad, 0, currentSpriteId);
+	currentSpriteId = oam_spr(12<<3, 15<<3, 0xbc, 0, currentSpriteId);
+	currentSpriteId = oam_spr(13<<3, 15<<3, 0xbd, 0, currentSpriteId);
 
-	currentSpriteId = oam_spr(16<<3, 14<<3, 0xac, 2, currentSpriteId);
-	currentSpriteId = oam_spr(17<<3, 14<<3, 0xad, 2, currentSpriteId);
-	currentSpriteId = oam_spr(16<<3, 15<<3, 0xbc, 2, currentSpriteId);
-	currentSpriteId = oam_spr(17<<3, 15<<3, 0xbd, 2, currentSpriteId);
+	currentSpriteId = oam_spr(18<<3, 14<<3, 0xac, 2, currentSpriteId);
+	currentSpriteId = oam_spr(19<<3, 14<<3, 0xad, 2, currentSpriteId);
+	currentSpriteId = oam_spr(18<<3, 15<<3, 0xbc, 2, currentSpriteId);
+	currentSpriteId = oam_spr(19<<3, 15<<3, 0xbd, 2, currentSpriteId);
 
 	// Also show some cool build info because we can.
 	#if SHOW_VERSION_INFO
@@ -75,21 +75,22 @@ void banked_do_title() {
 	currentSpriteId = oam_spr(22<<3, 11<<3, 0x9c + scratch2, 3, currentSpriteId);
 	currentSpriteId = oam_spr(23<<3, 11<<3, 0x9d + scratch2, 3, currentSpriteId);
 
-	currentSpriteId = oam_spr(14<<3, 14<<3, 0xac + scratch2, 0, currentSpriteId);
-	currentSpriteId = oam_spr(15<<3, 14<<3, 0xad + scratch2, 0, currentSpriteId);
-	currentSpriteId = oam_spr(14<<3, 15<<3, 0xbc + scratch2, 0, currentSpriteId);
-	currentSpriteId = oam_spr(15<<3, 15<<3, 0xbd + scratch2, 0, currentSpriteId);
+	currentSpriteId = oam_spr(12<<3, 14<<3, 0xac + scratch2, 0, currentSpriteId);
+	currentSpriteId = oam_spr(13<<3, 14<<3, 0xad + scratch2, 0, currentSpriteId);
+	currentSpriteId = oam_spr(12<<3, 15<<3, 0xbc + scratch2, 0, currentSpriteId);
+	currentSpriteId = oam_spr(13<<3, 15<<3, 0xbd + scratch2, 0, currentSpriteId);
 
-	currentSpriteId = oam_spr(16<<3, 14<<3, 0xac + scratch2, 2, currentSpriteId);
-	currentSpriteId = oam_spr(17<<3, 14<<3, 0xad + scratch2, 2, currentSpriteId);
-	currentSpriteId = oam_spr(16<<3, 15<<3, 0xbc + scratch2, 2, currentSpriteId);
-	currentSpriteId = oam_spr(17<<3, 15<<3, 0xbd + scratch2, 2, currentSpriteId);
+	currentSpriteId = oam_spr(18<<3, 14<<3, 0xac + scratch2, 2, currentSpriteId);
+	currentSpriteId = oam_spr(19<<3, 14<<3, 0xad + scratch2, 2, currentSpriteId);
+	currentSpriteId = oam_spr(18<<3, 15<<3, 0xbc + scratch2, 2, currentSpriteId);
+	currentSpriteId = oam_spr(19<<3, 15<<3, 0xbd + scratch2, 2, currentSpriteId);
 
 	bank_spr(!((FRAME_COUNTER >> 3) & 0x1f));
 	bank_bg(!((FRAME_COUNTER >> 3) & 0x1f));
 
 	if (scratch & (PAD_A | PAD_START)) {
 		gameState = GAME_STATE_POST_START;
+		sfx_play(SFX_PAUSE_UP, 2);
 	}
 
 }
@@ -152,6 +153,7 @@ void banked_do_instructions() {
 	while (1) {
 		scratch = pad_trigger(0);
 		if (scratch & (PAD_A | PAD_START)) {
+			sfx_play(SFX_PAUSE_UP, 2);
 			break;
 		}
 		ppu_wait_frame();
