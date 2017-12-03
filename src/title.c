@@ -143,14 +143,15 @@ void banked_show_level_complete() {
 }
 
 void banked_do_level_complete() {
-	// TODO: timeout after x rounds.
-	while (1) {
+	i = 0;
+	while (i < LEVEL_COMPLETE_WAIT_TIME) {
 		scratch = pad_trigger(0);
 		if (scratch & (PAD_A | PAD_START)) {
 			gameState = GAME_STATE_POST_START;
 			break;
 		}
 		ppu_wait_frame();
+		++i;
 	}
 }
 
@@ -255,7 +256,7 @@ void banked_draw_win() {
 	put_str(NTADR_A(6,10), "Your quest is now");
 	put_str(NTADR_A(6,11), "over.");
 	
-	put_str(NTADR_A(12, 13), "- Stats -");
+	put_str(NTADR_A(11, 13), "- Stats -");
 	if (deathCounter == 0) {
 		put_str(NTADR_A(6, 15), "Deaths: NONE!");
 	} else {

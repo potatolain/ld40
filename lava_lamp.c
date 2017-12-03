@@ -276,9 +276,6 @@ void main(void) {
 
 	playMusic = 0;
 	mirrorMode = MIRROR_HORIZONTAL;
-
-	pal_col(1,0x19);//set dark green color
-	pal_col(17,0x19);
 	scroll(0, 0);
 	
 
@@ -347,6 +344,9 @@ void main(void) {
 				update_sprites();
 				do_movement();
 				update_sprites();
+
+				bank_spr(!((FRAME_COUNTER >> 3) & 0x1f));
+				bank_bg(!((FRAME_COUNTER >> 3) & 0x1f));
 
 				break;
 			case GAME_STATE_LEVEL_LOST:

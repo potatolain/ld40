@@ -47,7 +47,7 @@ void banked_do_movement() {
     unsigned char lockTime = get_lock_time();
 
     #if DEBUG
-		if (currentPadState & PAD_START && currentPadState & PAD_SELECT) {
+		if (staticPadState & PAD_START && currentPadState & PAD_SELECT) {
 			gameState = GAME_STATE_LEVEL_COMPLETE;
 			return;
 		}
@@ -80,13 +80,13 @@ void banked_do_movement() {
         playerVelocityLockTime = lockTime;
         playerXVelocity = 0;
         playerYVelocity = 0;
-        if (currentPadState & PAD_RIGHT) {
+        if (staticPadState & PAD_RIGHT) {
             playerDirection = PLAYER_DIRECTION_RIGHT;
-        } else if (currentPadState & PAD_LEFT) {
+        } else if (staticPadState & PAD_LEFT) {
             playerDirection = PLAYER_DIRECTION_LEFT;
-        } else if (currentPadState & PAD_UP) {
+        } else if (staticPadState & PAD_UP) {
             playerDirection = PLAYER_DIRECTION_UP;
-        } else if (currentPadState & PAD_DOWN) {
+        } else if (staticPadState & PAD_DOWN) {
             playerDirection = PLAYER_DIRECTION_DOWN;
         } else {
             // lol j/k

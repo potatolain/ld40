@@ -19,16 +19,26 @@ const unsigned char sprite_data[] = {
     SPRITE_TYPE_ENEMY, SPRITE_SIZE_NORMAL | SPRITE_PALETTE_2 | SPRITE_ANIM_FULL, 0x68, 6,
     // Evil space bunny
     SPRITE_TYPE_ENEMY, SPRITE_SIZE_NORMAL | SPRITE_PALETTE_2 | SPRITE_ANIM_FULL, 0x60, 7,
+    // Slow marble
+    SPRITE_TYPE_ENEMY, SPRITE_SIZE_NORMAL | SPRITE_PALETTE_0 | SPRITE_ANIM_DEFAULT, 0xc0, 1,
+    // Medium marble
+    SPRITE_TYPE_ENEMY, SPRITE_SIZE_NORMAL | SPRITE_PALETTE_3 | SPRITE_ANIM_DEFAULT, 0xc0, 2,
+    // Fast marble
+    SPRITE_TYPE_ENEMY, SPRITE_SIZE_NORMAL | SPRITE_PALETTE_1 | SPRITE_ANIM_DEFAULT, 0xc0, 4
     
 };
 
 static char sprite_directions[12];
 static char sprite_speeds[12];
+static char sprite_distances[12];
+static char expected_sprite_distances[12];
 
 void banked_draw_sprites() {
 	for (i = 0; i < 12; i++) {
         sprite_directions[i] = SPRITE_DIRECTION_UNDEF;
         sprite_speeds[i] = 0;
+        sprite_distances[i] = 0;
+        expected_sprite_distances[i] = 0;
     }
 
 	for (i = 0; i < 12 && currentLevel[MAP_TILE_SIZE + (i<<1)] != 255; ++i) {
@@ -84,29 +94,33 @@ void banked_update_sprites() {
 
             sprite_directions[i] = SPRITE_DIRECTION_UNDEF;
             sprite_speeds[i] = 0;
+            sprite_distances[i] = 0;
+            expected_sprite_distances[i] = 0;
             continue;
         }
 
-		scratchInt = (0x200 + FIRST_ENEMY_SPRITE_ID + (i<<4));
-		if ((extendedSpriteData[(i<<2)+1] & SPRITE_ANIM_MASK) == SPRITE_ANIM_DEFAULT) {
-			scratch = extendedSpriteData[(i<<2)+2];
-			scratch += (FRAME_COUNTER & 0x08) ? 0 : 2;
-			*(unsigned char*)(scratchInt+1) = scratch;
-			*(unsigned char*)(scratchInt+5) = scratch+1;
-			*(unsigned char*)(scratchInt+9) = scratch+0x10;
-			*(unsigned char*)(scratchInt+13) = scratch+0x11;
-		} else if ((extendedSpriteData[(i<<2)+1] & SPRITE_ANIM_MASK) == SPRITE_ANIM_FULL && sprite_directions[i] != SPRITE_DIRECTION_UNDEF) {
-			scratch = extendedSpriteData[(i<<2)+2];
-			scratch += (FRAME_COUNTER & 0x08) ? 0 : 2;
-			if (sprite_directions[i] != SPRITE_DIRECTION_UNDEF)
-				scratch += sprite_directions[i];
-			else
-				scratch += SPRITE_DIRECTION_DOWN;
-			*(unsigned char*)(scratchInt+1) = scratch;
-			*(unsigned char*)(scratchInt+5) = scratch+1;
-			*(unsigned char*)(scratchInt+9) = scratch+0x10;
-			*(unsigned char*)(scratchInt+13) = scratch+0x11;
-		}
+        scratchInt = (0x200 + FIRST_ENEMY_SPRITE_ID + (i<<4));
+        if (sprite_distances[i] <= expected_sprite_distances[i]) {
+            if ((extendedSpriteData[(i<<2)+1] & SPRITE_ANIM_MASK) == SPRITE_ANIM_DEFAULT) {
+                scratch = extendedSpriteData[(i<<2)+2];
+                scratch += (FRAME_COUNTER & 0x08) ? 0 : 2;
+                *(unsigned char*)(scratchInt+1) = scratch;
+                *(unsigned char*)(scratchInt+5) = scratch+1;
+                *(unsigned char*)(scratchInt+9) = scratch+0x10;
+                *(unsigned char*)(scratchInt+13) = scratch+0x11;
+            } else if ((extendedSpriteData[(i<<2)+1] & SPRITE_ANIM_MASK) == SPRITE_ANIM_FULL && sprite_directions[i] != SPRITE_DIRECTION_UNDEF) {
+                scratch = extendedSpriteData[(i<<2)+2];
+                scratch += (FRAME_COUNTER & 0x08) ? 0 : 2;
+                if (sprite_directions[i] != SPRITE_DIRECTION_UNDEF)
+                    scratch += sprite_directions[i];
+                else
+                    scratch += SPRITE_DIRECTION_DOWN;
+                *(unsigned char*)(scratchInt+1) = scratch;
+                *(unsigned char*)(scratchInt+5) = scratch+1;
+                *(unsigned char*)(scratchInt+9) = scratch+0x10;
+                *(unsigned char*)(scratchInt+13) = scratch+0x11;
+            }
+        }
 
 		// If you're an enemy, we can move you around! Imagine that...
 		if (extendedSpriteData[i<<2] == SPRITE_TYPE_ENEMY) {
@@ -117,7 +131,8 @@ void banked_update_sprites() {
 			if (sprite_directions[i] == SPRITE_DIRECTION_UNDEF) {
                 xDelta = (playerX >> 2) - scratch;
                 yDelta = (playerY >> 2) - scratch2;
-    
+
+                sprite_distances[i] = 0;
 
                 if (abs(xDelta) > abs(yDelta)) {
                     if (xDelta > 0) {
@@ -137,6 +152,7 @@ void banked_update_sprites() {
 
                 // Okay, while the player's moving for playerVelocityLockTime, we need to move extendedSpriteData[x+3] tiles, or ESD[x+3]*16 pixels. Math.
                 sprite_speeds[i] = (extendedSpriteData[(i<<2)+3]<<4) / playerVelocityLockTime;
+                expected_sprite_distances[i] = extendedSpriteData[(i<<2)+3]<<4;
                 if (sprite_speeds[i] == 0)
                     sprite_speeds[i] = 1;
             }
@@ -146,7 +162,7 @@ void banked_update_sprites() {
                 scratch5 = (scratch5 + 8) & 0xf0;
             }
 
-			if (sprite_directions[i] != SPRITE_DIRECTION_UNDEF) {
+			if (sprite_distances[i] <= expected_sprite_distances[i] && sprite_directions[i] != SPRITE_DIRECTION_UNDEF) {
 				switch (sprite_directions[i]) {
 					case SPRITE_DIRECTION_LEFT:
                         if (playerVelocityLockTime != 1)
@@ -188,7 +204,8 @@ void banked_update_sprites() {
 						}
 
 						break;
-				}
+                }
+                ++sprite_distances[i];
 
 			}
 			
