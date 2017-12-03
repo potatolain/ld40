@@ -26,6 +26,7 @@ extern const unsigned char BYTE_TO_BIT[8];
 
 // Get at the stuff in level data from whatever bank is loaded. (Loads const data from assembly)
 extern const char lvl_details[4];
+extern const unsigned char spritePalette[16], levelPalette[16];
 
 void put_str(unsigned int adr, const char *str);
 unsigned char test_collision(unsigned char tileId, unsigned char isPlayer);

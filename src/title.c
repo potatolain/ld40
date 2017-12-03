@@ -2,25 +2,49 @@
 #include "lib/neslib.h"
 #include "lib/boilerplate.h"
 #include "bin/build_info.h"
+#include "graphics/title_nametable.h"
 #pragma rodataseg ("ROM_00")
 #pragma codeseg ("ROM_00")
-const unsigned char titlePalette[16] = { 0x0f,0x21,0x21,0x31,0x0f,0x01,0x21,0x31,0x0f,0x06,0x16,0x26,0x0f,0x09,0x19,0x29 };
+
+const unsigned char titlePalette[16]={ 0x0f,0x21,0x11,0x31,0x0f,0x11,0x21,0x31,0x0f,0x05,0x25,0x35,0x0f,0x00,0x10,0x30 };
 
 
 
 void banked_draw_title() {
 	ppu_off();
 	pal_bg(titlePalette);
+	pal_spr(spritePalette);
 	pal_bright(0);
 
 	set_chr_bank_0(CHR_BANK_TITLE);
 	set_chr_bank_1(CHR_BANK_TITLE+1);
 	clear_screen();
+	vram_adr(NAMETABLE_A);
 
 	// Show a message to the user.
-	put_str(NTADR_A(2,8), "Fluffy Space Escape");
-	put_str(NTADR_A(2,12), "Ludum Dare 40 Entry");
-	put_str(NTADR_A(2,20), "Press Start to play");
+	vram_unrle(title_nametable);
+
+	// Add a couple cute sprites!
+	currentSpriteId = 0x10;
+	currentSpriteId = oam_spr(8<<3, 10<<3, 0x8c, 3, currentSpriteId);
+	currentSpriteId = oam_spr(9<<3, 10<<3, 0x8d, 3, currentSpriteId);
+	currentSpriteId = oam_spr(8<<3, 11<<3, 0x9c, 3, currentSpriteId);
+	currentSpriteId = oam_spr(9<<3, 11<<3, 0x9d, 3, currentSpriteId);
+	
+	currentSpriteId = oam_spr(22<<3, 10<<3, 0x8c, 3, currentSpriteId);
+	currentSpriteId = oam_spr(23<<3, 10<<3, 0x8d, 3, currentSpriteId);
+	currentSpriteId = oam_spr(22<<3, 11<<3, 0x9c, 3, currentSpriteId);
+	currentSpriteId = oam_spr(23<<3, 11<<3, 0x9d, 3, currentSpriteId);
+
+	currentSpriteId = oam_spr(14<<3, 14<<3, 0xac, 0, currentSpriteId);
+	currentSpriteId = oam_spr(15<<3, 14<<3, 0xad, 0, currentSpriteId);
+	currentSpriteId = oam_spr(14<<3, 15<<3, 0xbc, 0, currentSpriteId);
+	currentSpriteId = oam_spr(15<<3, 15<<3, 0xbd, 0, currentSpriteId);
+
+	currentSpriteId = oam_spr(16<<3, 14<<3, 0xac, 2, currentSpriteId);
+	currentSpriteId = oam_spr(17<<3, 14<<3, 0xad, 2, currentSpriteId);
+	currentSpriteId = oam_spr(16<<3, 15<<3, 0xbc, 2, currentSpriteId);
+	currentSpriteId = oam_spr(17<<3, 15<<3, 0xbd, 2, currentSpriteId);
 
 	// Also show some cool build info because we can.
 	#if SHOW_VERSION_INFO
@@ -37,6 +61,33 @@ void banked_draw_title() {
 
 void banked_do_title() {
 	scratch = pad_trigger(0);
+	scratch2 = (FRAME_COUNTER >> 4) & 0x01;
+	scratch2 <<= 1;
+
+	currentSpriteId = 0;
+	currentSpriteId = oam_spr(8<<3, 10<<3, 0x8c + scratch2, 3, currentSpriteId);
+	currentSpriteId = oam_spr(9<<3, 10<<3, 0x8d + scratch2, 3, currentSpriteId);
+	currentSpriteId = oam_spr(8<<3, 11<<3, 0x9c + scratch2, 3, currentSpriteId);
+	currentSpriteId = oam_spr(9<<3, 11<<3, 0x9d + scratch2, 3, currentSpriteId);
+	
+	currentSpriteId = oam_spr(22<<3, 10<<3, 0x8c + scratch2, 3, currentSpriteId);
+	currentSpriteId = oam_spr(23<<3, 10<<3, 0x8d + scratch2, 3, currentSpriteId);
+	currentSpriteId = oam_spr(22<<3, 11<<3, 0x9c + scratch2, 3, currentSpriteId);
+	currentSpriteId = oam_spr(23<<3, 11<<3, 0x9d + scratch2, 3, currentSpriteId);
+
+	currentSpriteId = oam_spr(14<<3, 14<<3, 0xac + scratch2, 0, currentSpriteId);
+	currentSpriteId = oam_spr(15<<3, 14<<3, 0xad + scratch2, 0, currentSpriteId);
+	currentSpriteId = oam_spr(14<<3, 15<<3, 0xbc + scratch2, 0, currentSpriteId);
+	currentSpriteId = oam_spr(15<<3, 15<<3, 0xbd + scratch2, 0, currentSpriteId);
+
+	currentSpriteId = oam_spr(16<<3, 14<<3, 0xac + scratch2, 2, currentSpriteId);
+	currentSpriteId = oam_spr(17<<3, 14<<3, 0xad + scratch2, 2, currentSpriteId);
+	currentSpriteId = oam_spr(16<<3, 15<<3, 0xbc + scratch2, 2, currentSpriteId);
+	currentSpriteId = oam_spr(17<<3, 15<<3, 0xbd + scratch2, 2, currentSpriteId);
+
+	bank_spr(!((FRAME_COUNTER >> 3) & 0x1f));
+	bank_bg(!((FRAME_COUNTER >> 3) & 0x1f));
+
 	if (scratch & (PAD_A | PAD_START)) {
 		gameState = GAME_STATE_POST_START;
 	}
@@ -46,7 +97,10 @@ void banked_do_title() {
 void banked_draw_instructions() {
 	animate_fadeout(5);
 	ppu_off();
+	oam_clear();
 	pal_bg(titlePalette);
+	bank_spr(0);
+	bank_bg(0);
 
 	set_chr_bank_0(CHR_BANK_TITLE);
 	set_chr_bank_1(CHR_BANK_TITLE+1);
