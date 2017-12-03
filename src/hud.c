@@ -147,7 +147,7 @@ void banked_do_pause() {
         screenBuffer[6] = NT_UPD_EOF;
         set_vram_update(screenBuffer);
 
-        if (scratch2 & PAD_START) {
+        if (scratch2 & (PAD_START | PAD_A)) {
             sfx_play(SFX_PAUSE_DOWN, 2);
             break;
         }
