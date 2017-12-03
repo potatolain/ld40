@@ -222,7 +222,7 @@ void banked_draw_dead() {
 	oam_clear();
 
     vram_adr(NAMETABLE_A + 0x03c0);
-    vram_fill(0xaa, 0x40);
+    vram_fill(0xff, 0x40);
 
 	vram_adr(NTADR_A(6, 11));
 	vram_put(HUD_TL);
