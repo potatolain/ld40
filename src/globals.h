@@ -132,6 +132,7 @@ char* itoa(int i, char b[]);
 #define SONG_DEAD 1
 #define SONG_COMPLETE 2
 #define SONG_TITLE 5
+#define SONG_ENDING 6
 
 #pragma zpsym ("currentPadState")
 #pragma zpsym ("staticPadState")

@@ -414,6 +414,7 @@ void main(void) {
 				animate_fadeout(5);
 				ppu_off();
 				draw_win();
+				music_play(SONG_ENDING);
 				ppu_on_all();
 				animate_fadein(5);
 				do_win();
