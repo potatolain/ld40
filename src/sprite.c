@@ -17,6 +17,9 @@ const unsigned char sprite_data[] = {
     SPRITE_TYPE_ENEMY, SPRITE_SIZE_NORMAL | SPRITE_PALETTE_3 | SPRITE_ANIM_FULL, 0x68, 3,
     // Fast freakin' alien
     SPRITE_TYPE_ENEMY, SPRITE_SIZE_NORMAL | SPRITE_PALETTE_2 | SPRITE_ANIM_FULL, 0x68, 6,
+    // Evil space bunny
+    SPRITE_TYPE_ENEMY, SPRITE_SIZE_NORMAL | SPRITE_PALETTE_2 | SPRITE_ANIM_FULL, 0x60, 7,
+    
 };
 
 static char sprite_directions[12];

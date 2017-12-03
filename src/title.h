@@ -7,3 +7,5 @@ void banked_draw_dead();
 void banked_do_dead();
 void banked_draw_win();
 void banked_do_win();
+void banked_draw_instructions();
+void banked_do_instructions();

@@ -42,7 +42,7 @@ char* itoa(int i, char b[]);
 #define SHOW_VERSION_INFO 1 
 #define DEBUG 1
 #define FIRST_LEVEL 0
-#define LAST_LEVEL 2
+#define LAST_LEVEL 3
 
 #define BANK_FIRST_LEVEL 2
 

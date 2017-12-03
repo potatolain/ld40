@@ -151,13 +151,15 @@ void banked_do_movement() {
 		if (playerYVelocity & 0x80) {
 			if (test_collision(currentLevel[(scratch2>>4)+((((scratch)>>4))<<4)], 1)) {
                 playerYVelocity = 0;
-                playerVelocityLockTime = 0;
+                // Don't do this, because we're waiting on enemy sprites to catch up
+                // playerVelocityLockTime = 0;
             }
             playerDirection = PLAYER_DIRECTION_UP;
 		} else {
 			if (test_collision(currentLevel[((scratch2)>>4)+((((scratch+PLAYER_HEIGHT)>>4))<<4)], 1)) {
                 playerYVelocity = 0;
-                playerVelocityLockTime = 0;
+                // Don't do this, because we're waiting on enemy sprites to catch up
+                // playerVelocityLockTime = 0;
 			}
             playerDirection = PLAYER_DIRECTION_DOWN;
 		}
@@ -169,13 +171,15 @@ void banked_do_movement() {
 		if (playerXVelocity & 0x80) {
 			if (test_collision(currentLevel[(scratch>>4)+((((scratch2)>>4))<<4)], 1)) {
                 playerXVelocity = 0;
-                playerVelocityLockTime = 0;
+                // Don't do this, because we're waiting on enemy sprites to catch up
+                // playerVelocityLockTime = 0;
 			}
             playerDirection = PLAYER_DIRECTION_LEFT;
 		} else {
 			if (test_collision(currentLevel[((scratch+PLAYER_WIDTH)>>4)+(((scratch2>>4))<<4)], 1)) {
                 playerXVelocity = 0;
-                playerVelocityLockTime = 0;
+                // Don't do this, because we're waiting on enemy sprites to catch up
+                // playerVelocityLockTime = 0;
 			}
             playerDirection = PLAYER_DIRECTION_RIGHT;
 		}

@@ -18,7 +18,7 @@
 #define CHR_BANK_0 0
 #define CHR_BANK_1 2 // NOTE: We have two copies of the same 4k data in the 8k .chr files (because I'm lazy, ok?) so we use bank 2 to get the inverted one.
 
-const unsigned char levelPalette[16]={ 0x0f,0x00,0x10,0x30,0x0f,0x11,0x21,0x31,0x0f,0x05,0x15,0x25,0x0f,0x09,0x19,0x29 };
+const unsigned char levelPalette[16]={ 0x0f,0x00,0x10,0x30,0x0f,0x11,0x21,0x31,0x0f,0x05,0x25,0x35,0x0f,0x09,0x19,0x29 };
 const unsigned char spritePalette[16]={ 0x0f,0x00,0x10,0x30,0x0f,0x11,0x21,0x31,0x0f,0x05,0x15,0x25,0x0f,0x09,0x19,0x29 };
 
 
@@ -230,6 +230,16 @@ void do_dead() {
 	banked_do_dead();
 }
 
+void draw_instructions() {
+	set_prg_bank(TITLE_BANK);
+	banked_draw_instructions();
+}
+
+void do_instructions() {
+	set_prg_bank(TITLE_BANK);
+	banked_do_instructions();
+}
+
 void draw_sprites() {
 	set_prg_bank(SPRITE_BANK);
 	banked_draw_sprites();
@@ -286,8 +296,11 @@ void main(void) {
 				break;
 			case GAME_STATE_TITLE:
 				do_title();
+
 				break;
 			case GAME_STATE_POST_START:
+				draw_instructions();
+				do_instructions();
 				currentLevelId = 0;
 				deathCounter = 0;
 				playerOverworldPosition = FIRST_LEVEL;
@@ -377,6 +390,7 @@ void main(void) {
 				ppu_on_all();
 				animate_fadein(5);
 				do_win();
+				animate_fadeout(5);
 				break;
 			default:
 				ppu_off();
