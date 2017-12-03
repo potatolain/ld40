@@ -52,7 +52,7 @@ void banked_draw_hud() {
 void banked_draw_pause() {
 	set_vram_update(NULL); // STOP HELPING, ENGINE
     vram_adr(NAMETABLE_C + 0x03c0);
-    vram_fill(0xaa, 0x40);
+    vram_fill(0x55, 0x40);
 
 	vram_adr(NTADR_C(6, 11));
 	vram_put(HUD_TL);
