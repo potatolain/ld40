@@ -90,14 +90,14 @@ void banked_update_sprites() {
 		scratchInt = (0x200 + FIRST_ENEMY_SPRITE_ID + (i<<4));
 		if ((extendedSpriteData[(i<<2)+1] & SPRITE_ANIM_MASK) == SPRITE_ANIM_DEFAULT) {
 			scratch = extendedSpriteData[(i<<2)+2];
-			scratch += (FRAME_COUNTER & 0x10) ? 0 : 2;
+			scratch += (FRAME_COUNTER & 0x08) ? 0 : 2;
 			*(unsigned char*)(scratchInt+1) = scratch;
 			*(unsigned char*)(scratchInt+5) = scratch+1;
 			*(unsigned char*)(scratchInt+9) = scratch+0x10;
 			*(unsigned char*)(scratchInt+13) = scratch+0x11;
 		} else if ((extendedSpriteData[(i<<2)+1] & SPRITE_ANIM_MASK) == SPRITE_ANIM_FULL && sprite_directions[i] != SPRITE_DIRECTION_UNDEF) {
 			scratch = extendedSpriteData[(i<<2)+2];
-			scratch += (FRAME_COUNTER & 0x10) ? 0 : 2;
+			scratch += (FRAME_COUNTER & 0x08) ? 0 : 2;
 			if (sprite_directions[i] != SPRITE_DIRECTION_UNDEF)
 				scratch += sprite_directions[i];
 			else

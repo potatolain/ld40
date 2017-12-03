@@ -193,7 +193,7 @@ void banked_do_movement() {
 	scratch2 = playerY>>2;
 
 	currentSpriteId = PLAYER_SPRITE_ID;
-	scratch3 = PLAYER_SPRITE_TILE + ((playerAnimState & 0x04) >> 1) + playerDirection;
+	scratch3 = PLAYER_SPRITE_TILE + (((playerAnimState >> 1) & 0x04) >> 1) + playerDirection;
 
     currentSpriteId = oam_spr(scratch, scratch2, scratch3, 0, PLAYER_SPRITE_ID);
 	currentSpriteId = oam_spr(scratch+8, scratch2, scratch3+1, 0, currentSpriteId);

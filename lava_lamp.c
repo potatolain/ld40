@@ -341,6 +341,10 @@ void main(void) {
 			case GAME_STATE_RUNNING:
 				staticPadState = pad_trigger(0);		
 				currentPadState = pad_state(0);
+				
+				// Cheap trick - make the game move at double speed
+				do_movement();
+				update_sprites();
 				do_movement();
 				update_sprites();
 
