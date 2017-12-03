@@ -22,14 +22,15 @@ ifeq ($(OS),Windows_NT)
 	TEXT2DATA=tools/famitone2/tools/text2data
 	NSF2DATA=tools/famitone2/tools/nsf2data
 	BUILD_DATE=$(shell echo %DATE% %TIME:~0,5%)
-	BUILD_DATE_ONLY=$(shell echo %DATE%)
-	BUILD_TIME_ONLY=$(shell echo %TIME:~0,5%)
+	BUILD_DATE_ONLY=$(shell echo %DATE:~4%)
+# NOTE: I cheated and hard-coded my timezone here :( No good way to get it on Windows
+	BUILD_TIME_ONLY=$(shell echo %TIME:~0,5% EDT)
 else
 	TEXT2DATA=echo Music compilation can only be done under Windows. There is not a good linux/osx port. Exiting without doing anything. 
 	NSF2DATA=echo Sound effect compilation can only be done under Windows. There is not a good linux/osx port. Exiting without doing anything.
 	BUILD_DATE=$(shell date +"%a %m/%d/%Y  %H:%M")
-	BUILD_DATE_ONLY=$(shell date +"%a %m/%d/%Y")
-	BUILD_TIME_ONLY=$(shell date +"%H:%M")
+	BUILD_DATE_ONLY=$(shell date +"%m/%d/%Y")
+	BUILD_TIME_ONLY=$(shell date +"%H:%M %Z")
 endif
 
 ### USER EDITABLE STUFF ENDS HERE

@@ -266,9 +266,9 @@ void banked_draw_win() {
 			vram_put(screenBuffer[i] - 0x20);
 		}
 	}
-	put_str(NTADR_A(6,16), "Built " BUILD_DATE_ONLY);
-	put_str(NTADR_A(6,17), "       " BUILD_TIME_ONLY);
-	put_str(NTADR_A(6,18), "Build: " BUILD_NUMBER_STR " (" GIT_COMMIT_ID_SHORT ")");
+	put_str(NTADR_A(6,16), "Built:  " BUILD_DATE_ONLY);
+	put_str(NTADR_A(6,17), "        " BUILD_TIME_ONLY);
+	put_str(NTADR_A(6,18), "Build:  " BUILD_NUMBER_STR " (" GIT_COMMIT_ID_SHORT ")");
 	put_str(NTADR_A(6,20), "Made in 48 hours");
 	put_str(NTADR_A(6,21), "for Ludum Dare 40");
 
