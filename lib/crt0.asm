@@ -263,7 +263,7 @@ sounds_data:
 	.incbin "graphics/game.chr"
 
 ; MMC1 needs a reset stub in every bank that will put us into a known state. This defines it for all banks.
-.repeat $0f, I
+.repeat $03, I
 	resetstub_in .concat("STUB_", .sprintf("%02X", I))
 .endrepeat 
 resetstub_in "STUB_PRG"
@@ -276,7 +276,7 @@ resetstub_in "STUB_PRG"
 		jmp start
 .endmacro
 
-.repeat $0f, I
+.repeat $03, I
 	first_byte_reset_in .concat("ROM_", .sprintf("%02X", I))
 .endrepeat
 
