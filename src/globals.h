@@ -15,6 +15,7 @@ extern unsigned char gemsInLevel;
 extern int xDelta, yDelta, scratchX, scratchY;
 extern unsigned int deathCounter;
 extern unsigned char iShifted;
+extern unsigned char movementJustSwapped;
 
 extern unsigned char collisionTemp;
 
@@ -164,6 +165,7 @@ char* itoa(int i, char b[]);
 #pragma zpsym ("deathCounter")
 #pragma zpsym ("collisionTemp")
 #pragma zpsym ("iShifted")
+#pragma zpsym ("movementJustSwapped")
 
 #pragma zpsym ("maxVelocity")
 #pragma zpsym ("lockTime")

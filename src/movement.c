@@ -45,6 +45,7 @@ unsigned char get_lock_time() {
 void banked_do_movement() {
     maxVelocity = get_bunny_speed();
     lockTime = get_lock_time();
+    movementJustSwapped = 0;
 
     #if DEBUG
 		if (staticPadState & PAD_START && currentPadState & PAD_SELECT) {
@@ -80,6 +81,7 @@ void banked_do_movement() {
         playerVelocityLockTime = lockTime;
         playerXVelocity = 0;
         playerYVelocity = 0;
+        movementJustSwapped = 1;
         if (staticPadState & PAD_RIGHT) {
             playerDirection = PLAYER_DIRECTION_RIGHT;
         } else if (staticPadState & PAD_LEFT) {
@@ -91,6 +93,7 @@ void banked_do_movement() {
         } else {
             // lol j/k
             playerVelocityLockTime = 0;
+            movementJustSwapped = 0;
         }
     }
 
@@ -153,6 +156,8 @@ void banked_do_movement() {
                 playerYVelocity = 0;
                 // Don't do this, because we're waiting on enemy sprites to catch up
                 // playerVelocityLockTime = 0;
+                if (movementJustSwapped)
+                    playerVelocityLockTime = 0;
             }
             playerDirection = PLAYER_DIRECTION_UP;
 		} else {
@@ -160,6 +165,9 @@ void banked_do_movement() {
                 playerYVelocity = 0;
                 // Don't do this, because we're waiting on enemy sprites to catch up
                 // playerVelocityLockTime = 0;
+                if (movementJustSwapped)
+                    playerVelocityLockTime = 0;
+
 			}
             playerDirection = PLAYER_DIRECTION_DOWN;
 		}
@@ -173,6 +181,9 @@ void banked_do_movement() {
                 playerXVelocity = 0;
                 // Don't do this, because we're waiting on enemy sprites to catch up
                 // playerVelocityLockTime = 0;
+                if (movementJustSwapped)
+                    playerVelocityLockTime = 0;
+
 			}
             playerDirection = PLAYER_DIRECTION_LEFT;
 		} else {
@@ -180,6 +191,9 @@ void banked_do_movement() {
                 playerXVelocity = 0;
                 // Don't do this, because we're waiting on enemy sprites to catch up
                 // playerVelocityLockTime = 0;
+                if (movementJustSwapped)
+                    playerVelocityLockTime = 0;
+
 			}
             playerDirection = PLAYER_DIRECTION_RIGHT;
 		}

@@ -41,6 +41,7 @@ unsigned char gemsInLevel;
 int xDelta, yDelta, scratchX, scratchY;
 char collisionTemp;
 unsigned char iShifted;
+unsigned char movementJustSwapped;
 
 // Movement stuff - don't use outside.
 unsigned int maxVelocity;
