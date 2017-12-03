@@ -39,6 +39,13 @@ unsigned int deathCounter;
 int playerX, playerY, playerXVelocity, playerYVelocity;
 unsigned char gemsInLevel;
 int xDelta, yDelta, scratchX, scratchY;
+char collisionTemp;
+unsigned char iShifted;
+
+// Movement stuff - don't use outside.
+unsigned int maxVelocity;
+unsigned char lockTime;
+
 
 #pragma bssseg (pop)
 #pragma dataseg(pop)
@@ -263,14 +270,14 @@ void do_sprite_collision() {
 }
 
 unsigned char test_collision(unsigned char tileId, unsigned char isPlayer) {
-	char temp = tileId & 0x3f;
-	if (temp > 7 && temp < 16) {
+	collisionTemp = tileId & 0x3f;
+	if (collisionTemp > 7 && collisionTemp < 16) {
 		return 1;
 	}
-	if (temp > 19 && temp < 23) {
+	if (collisionTemp > 19 && collisionTemp < 23) {
 		return 1;
 	}
-	if (isPlayer && temp == TILE_DOOR_OPEN) {
+	if (isPlayer && collisionTemp == TILE_DOOR_OPEN) {
 		// HACK- make sure we're aligned to the grid before we ok it
 		if (
 			((playerDirection == PLAYER_DIRECTION_LEFT || playerDirection == PLAYER_DIRECTION_RIGHT ) && (playerX >> 2) % 16 > 6 && (playerX >> 2) % 16 < 10) ||

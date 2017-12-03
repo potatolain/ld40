@@ -43,8 +43,8 @@ unsigned char get_lock_time() {
 }
 
 void banked_do_movement() {
-    unsigned int maxVelocity = get_bunny_speed();
-    unsigned char lockTime = get_lock_time();
+    maxVelocity = get_bunny_speed();
+    lockTime = get_lock_time();
 
     #if DEBUG
 		if (staticPadState & PAD_START && currentPadState & PAD_SELECT) {

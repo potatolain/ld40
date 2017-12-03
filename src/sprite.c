@@ -19,7 +19,7 @@ const unsigned char sprite_data[] = {
     SPRITE_TYPE_ENEMY, SPRITE_SIZE_NORMAL | SPRITE_PALETTE_2 | SPRITE_ANIM_FULL, 0x68, 5,
     // Evil space bunny
     SPRITE_TYPE_ENEMY, SPRITE_SIZE_NORMAL | SPRITE_PALETTE_2 | SPRITE_ANIM_FULL, 0x60, 7,
-    // Slow marbleee
+    // Slow marble
     SPRITE_TYPE_ENEMY, SPRITE_SIZE_NORMAL | SPRITE_PALETTE_0 | SPRITE_ANIM_DEFAULT, 0xc0, 1,
     // Medium marble
     SPRITE_TYPE_ENEMY, SPRITE_SIZE_NORMAL | SPRITE_PALETTE_3 | SPRITE_ANIM_DEFAULT, 0xc0, 2,
@@ -54,7 +54,7 @@ void banked_draw_sprites() {
 
         // Scratch 1 is the position. Need to do some hax to get it to 16x16 coords
         // Why -1? Seems to align things to tiles, never figured that out in detail. Game jams make me do bad things >_>
-		scratch2 = ((scratch >> 4) << 4)-1; // Y
+		scratch2 = (scratch & 0xf0)-1; // Y
 		scratch = ((scratch % 16) << 4); // X
 		scratch3 = extendedSpriteData[(i<<2)+2];
 		// I'm so, so sorry.
@@ -102,30 +102,34 @@ void banked_update_sprites() {
         }
 
         scratchInt = (0x200 + FIRST_ENEMY_SPRITE_ID + (i<<4));
-        if (sprite_distances[i] <= expected_sprite_distances[i]) {
-            if ((extendedSpriteData[(i<<2)+1] & SPRITE_ANIM_MASK) == SPRITE_ANIM_DEFAULT) {
-                scratch = extendedSpriteData[(i<<2)+2];
-                scratch += (FRAME_COUNTER & 0x08) ? 0 : 2;
-                *(unsigned char*)(scratchInt+1) = scratch;
-                *(unsigned char*)(scratchInt+5) = scratch+1;
-                *(unsigned char*)(scratchInt+9) = scratch+0x10;
-                *(unsigned char*)(scratchInt+13) = scratch+0x11;
-            } else if ((extendedSpriteData[(i<<2)+1] & SPRITE_ANIM_MASK) == SPRITE_ANIM_FULL && sprite_directions[i] != SPRITE_DIRECTION_UNDEF) {
-                scratch = extendedSpriteData[(i<<2)+2];
-                scratch += (FRAME_COUNTER & 0x08) ? 0 : 2;
-                if (sprite_directions[i] != SPRITE_DIRECTION_UNDEF)
-                    scratch += sprite_directions[i];
-                else
-                    scratch += SPRITE_DIRECTION_DOWN;
-                *(unsigned char*)(scratchInt+1) = scratch;
-                *(unsigned char*)(scratchInt+5) = scratch+1;
-                *(unsigned char*)(scratchInt+9) = scratch+0x10;
-                *(unsigned char*)(scratchInt+13) = scratch+0x11;
-            }
-        }
+        iShifted = i<<2;
 
 		// If you're an enemy, we can move you around! Imagine that...
-		if (extendedSpriteData[i<<2] == SPRITE_TYPE_ENEMY) {
+		if (extendedSpriteData[iShifted] == SPRITE_TYPE_ENEMY) {
+
+            if (sprite_distances[i] <= expected_sprite_distances[i]) {
+                if ((extendedSpriteData[(iShifted)+1] & SPRITE_ANIM_MASK) == SPRITE_ANIM_DEFAULT) {
+                    scratch = extendedSpriteData[(iShifted)+2];
+                    scratch += (FRAME_COUNTER & 0x08) ? 0 : 2;
+                    *(unsigned char*)(scratchInt+1) = scratch;
+                    *(unsigned char*)(scratchInt+5) = scratch+1;
+                    *(unsigned char*)(scratchInt+9) = scratch+0x10;
+                    *(unsigned char*)(scratchInt+13) = scratch+0x11;
+                } else if ((extendedSpriteData[(iShifted)+1] & SPRITE_ANIM_MASK) == SPRITE_ANIM_FULL && sprite_directions[i] != SPRITE_DIRECTION_UNDEF) {
+                    scratch = extendedSpriteData[(iShifted)+2];
+                    scratch += (FRAME_COUNTER & 0x08) ? 0 : 2;
+                    if (sprite_directions[i] != SPRITE_DIRECTION_UNDEF)
+                        scratch += sprite_directions[i];
+                    else
+                        scratch += SPRITE_DIRECTION_DOWN;
+                    *(unsigned char*)(scratchInt+1) = scratch;
+                    *(unsigned char*)(scratchInt+5) = scratch+1;
+                    *(unsigned char*)(scratchInt+9) = scratch+0x10;
+                    *(unsigned char*)(scratchInt+13) = scratch+0x11;
+                }
+            }
+        
+
 			scratch = scratch4 = *(unsigned char*)(scratchInt+3); // X
 			scratch2 = scratch5 = *(unsigned char*)(scratchInt); // Y
             // scratch3 is whether to switch direction... 
@@ -153,8 +157,8 @@ void banked_update_sprites() {
 				sprite_directions[i] = scratch3;
 
                 // Okay, while the player's moving for playerVelocityLockTime, we need to move extendedSpriteData[x+3] tiles, or ESD[x+3]*16 pixels. Math.
-                sprite_speeds[i] = (extendedSpriteData[(i<<2)+3]<<4) / playerVelocityLockTime;
-                expected_sprite_distances[i] = extendedSpriteData[(i<<2)+3]<<4;
+                sprite_speeds[i] = (extendedSpriteData[(iShifted)+3]<<4) / playerVelocityLockTime;
+                expected_sprite_distances[i] = extendedSpriteData[(iShifted)+3]<<4;
                 if (sprite_speeds[i] == 0)
                     sprite_speeds[i] = 1;
             }

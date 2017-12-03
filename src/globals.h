@@ -14,10 +14,17 @@ extern int playerX, playerY, playerXVelocity, playerYVelocity;
 extern unsigned char gemsInLevel;
 extern int xDelta, yDelta, scratchX, scratchY;
 extern unsigned int deathCounter;
+extern unsigned char iShifted;
+
+extern unsigned char collisionTemp;
 
 extern char currentLevel[256];
 extern char screenBuffer[48];
 extern char extendedSpriteData[56];
+
+// Movement stuff - don't use outside.
+extern unsigned int maxVelocity;
+extern unsigned char lockTime;
 
 extern unsigned char FRAME_COUNTER;
 
@@ -154,3 +161,8 @@ char* itoa(int i, char b[]);
 #pragma zpsym ("xDelta")
 #pragma zpsym ("yDelta")
 #pragma zpsym ("deathCounter")
+#pragma zpsym ("collisionTemp")
+#pragma zpsym ("iShifted")
+
+#pragma zpsym ("maxVelocity")
+#pragma zpsym ("lockTime")
