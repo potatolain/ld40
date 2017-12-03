@@ -5,3 +5,5 @@ void banked_show_level_complete();
 void banked_do_level_complete();
 void banked_draw_dead();
 void banked_do_dead();
+void banked_draw_win();
+void banked_do_win();

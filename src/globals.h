@@ -13,6 +13,7 @@ extern unsigned char playerDirection, playerAnimState, playerVelocityLockTime, p
 extern int playerX, playerY, playerXVelocity, playerYVelocity;
 extern unsigned char gemsInLevel;
 extern int xDelta, yDelta, scratchX, scratchY;
+extern unsigned int deathCounter;
 
 extern char currentLevel[256];
 extern char screenBuffer[48];
@@ -33,6 +34,7 @@ void update_hud();
 void clear_screen();
 void animate_fadeout(unsigned char _delay);
 void animate_fadein(unsigned char _delay);
+char* itoa(int i, char b[]);
 
 // Crappy macro to get absolute value in an absolutely disgusting way
 #define abs(x) (x > 0 ? x : 0-x)
@@ -40,6 +42,7 @@ void animate_fadein(unsigned char _delay);
 #define SHOW_VERSION_INFO 1 
 #define DEBUG 1
 #define FIRST_LEVEL 0
+#define LAST_LEVEL 2
 
 #define BANK_FIRST_LEVEL 2
 
@@ -54,6 +57,7 @@ void animate_fadein(unsigned char _delay);
 #define GAME_STATE_PAUSE 100
 #define GAME_STATE_TITLE 201
 #define GAME_STATE_INIT 200
+#define GAME_STATE_WON 250
 
 #define PLAYER_SPRITE_TILE 0x60
 
@@ -145,3 +149,4 @@ void animate_fadein(unsigned char _delay);
 #pragma zpsym ("scratchY")
 #pragma zpsym ("xDelta")
 #pragma zpsym ("yDelta")
+#pragma zpsym ("deathCounter")

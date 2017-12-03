@@ -149,3 +149,45 @@ void banked_do_dead() {
 	}
 
 }
+
+
+void banked_draw_win() {
+	ppu_off();
+	pal_bg(titlePalette);
+
+	set_chr_bank_0(CHR_BANK_TITLE);
+	set_chr_bank_1(CHR_BANK_TITLE+1);
+	clear_screen();
+
+	// Show a message to the user.
+	put_str(NTADR_A(2,8), "You Won!");
+	put_str(NTADR_A(2, 12), "And you only died ");
+
+	set_vram_update(NULL);
+	itoa(deathCounter, &screenBuffer[0]);
+	for (i = 0; i < 8 && screenBuffer[i] != '\0'; ++i) {
+		vram_put(screenBuffer[i] - 0x20);
+	}
+
+	vram_put(HUD_BLANK);
+	vram_put('t' - 0x20);
+	vram_put('i' - 0x20);
+	vram_put('m' - 0x20);
+	vram_put('e' - 0x20);
+	vram_put('s' - 0x20);
+	vram_put('!' - 0x20);
+
+	ppu_on_all();	
+}
+
+void banked_do_win() {
+	while (1) {
+		scratch = pad_trigger(0);
+		if (scratch & (PAD_A | PAD_START)) {
+			gameState = GAME_STATE_INIT;
+			break;
+		}
+		ppu_wait_frame();
+	}
+
+}

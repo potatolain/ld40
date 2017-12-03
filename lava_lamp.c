@@ -22,7 +22,6 @@ const unsigned char levelPalette[16]={ 0x0f,0x00,0x10,0x30,0x0f,0x11,0x21,0x31,0
 const unsigned char spritePalette[16]={ 0x0f,0x00,0x10,0x30,0x0f,0x11,0x21,0x31,0x0f,0x05,0x15,0x25,0x0f,0x09,0x19,0x29 };
 
 
-
 // Globals! Defined as externs in src/globals.h
 #pragma bssseg (push,"ZEROPAGE")
 #pragma dataseg(push,"ZEROPAGE")
@@ -36,6 +35,7 @@ unsigned char currentSpriteId;
 unsigned int scratchInt;
 unsigned char gemCount;
 unsigned char playerDirection, playerAnimState, playerVelocityLockTime, playerInvulnTime;
+unsigned int deathCounter;
 int playerX, playerY, playerXVelocity, playerYVelocity;
 unsigned char gemsInLevel;
 int xDelta, yDelta, scratchX, scratchY;
@@ -51,6 +51,29 @@ const unsigned char BYTE_TO_BIT[] = {
 	0x10, 0x20, 0x40, 0x80
 };
 
+
+// Quick-n-dirty convert integer to string, to show an error code on our error screen.
+// Hat tip: http://stackoverflow.com/questions/9655202/how-to-convert-integer-to-string-in-c
+char* itoa(int i, char b[]){
+    char const digit[] = "0123456789";
+    char* p = b;
+	int shifter;
+    if(i<0){
+        *p++ = '-';
+        i *= -1;
+    }
+    shifter = i;
+    do{ //Move to where representation ends
+        ++p;
+        shifter = shifter/10;
+    }while(shifter);
+    *p = '\0';
+    do{ //Move back, inserting digits as u go
+        *--p = digit[i%10];
+        i = i/10;
+    }while(i);
+    return b;
+}
 
 // Local to this file.
 static unsigned char playMusic;
@@ -136,6 +159,16 @@ void draw_level() {
 void draw_hud() {
 	set_prg_bank(HUD_BANK);
 	banked_draw_hud();
+}
+
+void draw_win() {
+	set_prg_bank(TITLE_BANK);
+	banked_draw_win();
+}
+
+void do_win() {
+	set_prg_bank(TITLE_BANK);
+	banked_do_win();
 }
 
 void update_hud() {
@@ -256,6 +289,7 @@ void main(void) {
 				break;
 			case GAME_STATE_POST_START:
 				currentLevelId = 0;
+				deathCounter = 0;
 				playerOverworldPosition = FIRST_LEVEL;
 				gameState = GAME_STATE_LEVEL_START;
 				break;
@@ -301,6 +335,7 @@ void main(void) {
 			case GAME_STATE_LEVEL_LOST:
 				animate_fadeout(5);
 				draw_dead();
+				deathCounter++;
 				animate_fadein(5);
 				do_dead();
 				gameState = GAME_STATE_LEVEL_START;
@@ -313,6 +348,9 @@ void main(void) {
 				do_level_complete();
 				gameState = GAME_STATE_LEVEL_START;
 				playerOverworldPosition++;
+				if (playerOverworldPosition == LAST_LEVEL) {
+					gameState = GAME_STATE_WON;
+				}
 				break;
 			case GAME_STATE_PAUSE:
 				animate_fadeout(5);
@@ -331,6 +369,14 @@ void main(void) {
 					animate_fadein(5);
 					music_pause(0);
 				}
+				break;
+			case GAME_STATE_WON:
+				animate_fadeout(5);
+				ppu_off();
+				draw_win();
+				ppu_on_all();
+				animate_fadein(5);
+				do_win();
 				break;
 			default:
 				ppu_off();
