@@ -127,7 +127,7 @@ char* itoa(int i, char b[]);
 
 #define LEVEL_COMPLETE_WAIT_TIME 60
 
-#define SONG_DUMB 0
+#define SONG_DUMB 4
 #define SONG_DEAD 1
 #define SONG_COMPLETE 2
 
