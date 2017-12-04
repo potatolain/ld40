@@ -1,10 +1,23 @@
-# TBD
+# Fluffy Space Escape
 
-Some NES thingie. To be determined. Probably 80s+space themed.
+Fluffy Space Escape is a turn-based puzzle game for the NES.
+
+The year is 2248. You are a rabbit that has been transported into space after a teleporter mishap. You must fight your way through space to find your way home.
+
+A series of teleporters can get you back. These teleporters are powered by gems. However, these gems are extremely heavy! The more gems you have, the slower you are able to move.
+
+Can you get the bunny back to earth before the end?
 
 [Download](http://cpprograms.net/devnull/circleci-redirect.php?namespace=cppchriscpp&project=ld40&file=lava_lamp.nes)
 
 [Play](http://cpprograms.net/classic-gaming/ld40/)
+
+# Compiling/etc 
+
+This is built off of [nes-c-boilerplate](https://github.com/cppchriscpp/nes-c-boilerplate), which has all detail 
+you need to compile this rom. 
+
+The only extra tool required is nodejs 4+ for the level conversion tool.
 
 # Credits
 
