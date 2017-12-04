@@ -48,10 +48,10 @@ char* itoa(int i, char b[]);
 // Crappy macro to get absolute value in an absolutely disgusting way
 #define abs(x) (x > 0 ? x : 0-x)
 
-#define SHOW_VERSION_INFO 1 
-#define DEBUG 1
+#define SHOW_VERSION_INFO 0
+#define DEBUG 0
 #define FIRST_LEVEL 0
-#define LAST_LEVEL 12
+#define LAST_LEVEL 11
 
 #define BANK_FIRST_LEVEL 2
 
