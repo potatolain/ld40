@@ -160,13 +160,25 @@ void do_level_complete() {
 }
 
 void draw_level() {
+	set_vram_update(NULL);
 	set_prg_bank(LEVEL_BANK);
 	banked_draw_level();
 }
 
+void draw_level_to_b() {
+	set_prg_bank(LEVEL_BANK);
+	banked_draw_level_to_b();
+}
+
+
 void draw_hud() {
 	set_prg_bank(HUD_BANK);
 	banked_draw_hud();
+}
+
+void draw_hud_to_b() {
+	set_prg_bank(HUD_BANK);
+	banked_draw_hud_to_b();
 }
 
 void draw_win() {
@@ -320,21 +332,39 @@ void main(void) {
 				music_pause(1);
 				draw_instructions();
 				do_instructions();
+				set_mirroring(MIRROR_HORIZONTAL);
 				currentLevelId = 0;
 				deathCounter = 0;
 				playerOverworldPosition = FIRST_LEVEL;
 				gameState = GAME_STATE_LEVEL_START;
-				break;
-			case GAME_STATE_LEVEL_START: 
-				animate_fadeout(5);
-				scroll(0, 0);				
+
 				gemsInLevel = 0;
 				set_prg_bank(BANK_FIRST_LEVEL+currentLevelId);
 
 				// NOTE: Yes, this says lvl1 - it'll line up with whatever we get though.
 				memcpy(currentLevel, lvl1 + (playerOverworldPosition << 8), 256);
-
+				animate_fadeout(5);
 				ppu_off();
+				draw_level();
+				gemsInLevel = 0;
+				draw_sprites();
+				oam_hide_rest(4);
+				draw_hud();
+				pal_bg(levelPalette);
+				pal_spr(spritePalette);
+				set_chr_bank_0(CHR_BANK_MAIN);
+				set_chr_bank_1(CHR_BANK_MAIN+1);	
+
+				ppu_on_all();
+				animate_fadein(5);
+
+				break;
+			case GAME_STATE_LEVEL_START: 
+				// animate_fadeout(5);
+				// ppu_off();
+				set_mirroring(MIRROR_HORIZONTAL);
+				scroll(0, 0);				
+
 				pal_bg(levelPalette);
 				pal_spr(spritePalette);
 				set_chr_bank_0(CHR_BANK_MAIN);
@@ -347,15 +377,15 @@ void main(void) {
 				playerXVelocity = 0;
 				playerYVelocity = 0;
 				playerVelocityLockTime = 0;		
-				draw_level();
+				// draw_level();
+				gemsInLevel = 0;
 				draw_sprites();
-				draw_hud();				
+				update_hud();
 				// TODO: Nice fade anim into level(s)
-				ppu_on_all();
-				animate_fadein(5);
 				gameState = GAME_STATE_RUNNING;
 				music_play(SONG_DUMB);
 				music_pause(0);
+				ppu_on_all();
 				break;
 			
 			case GAME_STATE_RUNNING:
@@ -373,24 +403,92 @@ void main(void) {
 
 				break;
 			case GAME_STATE_LEVEL_LOST:
+				set_mirroring(MIRROR_HORIZONTAL);
 				animate_fadeout(5);
 				draw_dead();
 				deathCounter++;
 				animate_fadein(5);
 				do_dead();
+				animate_fadeout(5);
+				ppu_off();
+
+				pal_bg(levelPalette);
+				pal_spr(spritePalette);
+				set_chr_bank_0(CHR_BANK_MAIN);
+				set_chr_bank_1(CHR_BANK_MAIN+1);	
+
+
+				set_prg_bank(BANK_FIRST_LEVEL+currentLevelId);
+				// NOTE: Yes, this says lvl1 - it'll line up with whatever we get though.
+				memcpy(currentLevel, lvl1 + (playerOverworldPosition << 8), 256);
+				draw_level();
+				gemCount = 0;
+				antiGemCount = 0;
+				gemsInLevel = 0;
+				draw_sprites();				
+				draw_hud();
+				draw_level();
+				scroll(0, 0);
+
+				ppu_on_all();
+				animate_fadein(5);
 				gameState = GAME_STATE_LEVEL_START;
 				break;
 			case GAME_STATE_LEVEL_COMPLETE:
 				music_play(SONG_COMPLETE);			
 				animate_fadeout(5);
+				oam_hide_rest(0);
 				show_level_complete();
 				animate_fadein(5);
 				do_level_complete();
-				gameState = GAME_STATE_LEVEL_START;
-				playerOverworldPosition++;
+				animate_fadeout(5);
+
 				if (playerOverworldPosition == LAST_LEVEL) {
 					gameState = GAME_STATE_WON;
+				} else {
+						
+					ppu_off();
+					
+					set_mirroring(MIRROR_VERTICAL);
+					gameState = GAME_STATE_LEVEL_START;
+					set_prg_bank(BANK_FIRST_LEVEL+currentLevelId);
+					memcpy(currentLevel, lvl1 + (playerOverworldPosition << 8), 256);
+					draw_level_to_b();
+					playerOverworldPosition++;
+	
+					set_prg_bank(BANK_FIRST_LEVEL+currentLevelId);
+					// NOTE: Yes, this says lvl1 - it'll line up with whatever we get though.
+					memcpy(currentLevel, lvl1 + (playerOverworldPosition << 8), 256);
+					draw_level();
+					gemCount = 0;
+					antiGemCount = 0;
+					gemsInLevel = 0;
+					draw_sprites();
+					oam_hide_rest(4);		
+					draw_hud();
+					draw_hud_to_b();
+					// Create sprite 0
+					oam_spr(0, 191, HUD_TL, 1, 0);
+	
+					pal_bg(levelPalette);
+					pal_spr(spritePalette);
+					set_chr_bank_0(CHR_BANK_MAIN);
+					set_chr_bank_1(CHR_BANK_MAIN+1);	
+	
+					scroll(256, 0);
+					ppu_on_all();
+					animate_fadein(5);
+					
+
+					for (scratchInt = 256; scratchInt != 504; scratchInt += 2) {
+						scroll(scratchInt, 0);
+						split(0, 190);
+						ppu_wait_nmi();
+					}
 				}
+				set_mirroring(MIRROR_HORIZONTAL);
+				
+
 				break;
 			case GAME_STATE_PAUSE:
 				animate_fadeout(5);
@@ -408,10 +506,23 @@ void main(void) {
 					ppu_on_all();
 					animate_fadein(5);
 					music_pause(0);
+				} else {
+					animate_fadeout(5);
+					ppu_off();
+					update_hud();
+					gemsInLevel = 0;
+					draw_sprites();
+					scroll(0, 0);
+					set_prg_bank(BANK_FIRST_LEVEL+currentLevelId);
+					// NOTE: Yes, this says lvl1 - it'll line up with whatever we get though.
+					memcpy(currentLevel, lvl1 + (playerOverworldPosition << 8), 256);
+	
+					draw_level();
+					ppu_on_all();
+					animate_fadein(5);
 				}
 				break;
 			case GAME_STATE_WON:
-				animate_fadeout(5);
 				ppu_off();
 				draw_win();
 				music_play(SONG_ENDING);
