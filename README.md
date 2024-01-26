@@ -8,13 +8,11 @@ A series of teleporters can get you back. These teleporters are powered by gems.
 
 Can you get the bunny back to earth before the end?
 
-[Download](http://cpprograms.net/devnull/circleci-redirect.php?namespace=cppchriscpp&project=ld40&file=lava_lamp.nes)
-
-[Play](http://cpprograms.net/classic-gaming/ld40/)
+[Play or Download](http://cpprograms.net/classic-gaming/ld40/)
 
 # Compiling/etc 
 
-This is built off of [nes-c-boilerplate](https://github.com/cppchriscpp/nes-c-boilerplate), which has all detail 
+This is built off of [nes-c-boilerplate](https://gh.nes.science/nes-c-boilerplate), which has all detail 
 you need to compile this rom. 
 
 The only extra tool required is nodejs 4+ for the level conversion tool.
